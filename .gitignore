@@ -1,2 +1,22 @@
+# Dependencies
+/node_modules
+
+# Vercel
 .vercel/
-dist/
+
+# Build files
+/dist/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env*.local
+*.env
+
+# Astro
+.astro/
