@@ -3,46 +3,54 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
-// --- تهيئة Firebase Admin SDK ---
+// This function will be called to get an initialized app instance.
+function getInitializedApp() {
+    // If already initialized, return the app.
+    if (getApps().length > 0) {
+        return getApps()[0];
+    }
 
-// استرداد بيانات اعتماد الخدمة من متغيرات البيئة.
-// هذا الإجراء آمن ويتجنب كتابة البيانات الحساسة مباشرة في الكود.
-const serviceAccountString = import.meta.env.FIREBASE_SERVICE_ACCOUNT;
+    // If not initialized, try to initialize.
+    const serviceAccountString = import.meta.env.FIREBASE_SERVICE_ACCOUNT;
+    
+    // During the build process (`astro build`), this variable might not be available.
+    // We return null so the build doesn't crash.
+    if (!serviceAccountString) {
+        console.warn('[server.js] FIREBASE_SERVICE_ACCOUNT env var not found. Admin SDK not initialized. This is expected during build.');
+        return null;
+    }
 
-// التحقق من وجود متغير البيئة
-if (!serviceAccountString) {
-  // إذا كان المتغير غير موجود، يتم إيقاف التشغيل مع رسالة خطأ واضحة.
-  // هذا يمنع الأخطاء الغامضة ويخبر المطور بالضبط ما يجب فعله.
-  console.error('ERROR: The FIREBASE_SERVICE_ACCOUNT environment variable is not set.');
-  throw new Error('The FIREBASE_SERVICE_ACCOUNT environment variable is not set. Please add your service account JSON to your project secrets.');
+    try {
+        const serviceAccount = JSON.parse(serviceAccountString);
+        console.log('[server.js] Initializing Firebase Admin SDK...');
+        const app = initializeApp({
+            credential: cert(serviceAccount)
+        });
+        console.log('[server.js] Firebase Admin SDK initialized successfully.');
+        return app;
+    } catch (e) {
+        console.error('[server.js] ERROR: Failed to parse or initialize Firebase Admin SDK.');
+        console.error(e);
+        // Return null if initialization fails.
+        return null;
+    }
 }
 
-let serviceAccount;
-try {
-  // محاولة تحليل سلسلة JSON إلى كائن JavaScript
-  serviceAccount = JSON.parse(serviceAccountString);
-} catch (e) {
-  console.error('ERROR: Failed to parse the FIREBASE_SERVICE_ACCOUNT string. Make sure it is a valid JSON.');
-  throw new Error('Failed to parse the FIREBASE_SERVICE_ACCOUNT. Ensure it is copied correctly and is a valid JSON string.');
+// Export functions that provide the auth and db services.
+// They will attempt to get the initialized app each time they are called.
+// This ensures that if initialization failed during build, it can be retried on a server-side request.
+export function getAdminAuth() {
+    const app = getInitializedApp();
+    if (!app) {
+        throw new Error('Firebase Admin SDK is not available. Check server logs for initialization errors.');
+    }
+    return getAuth(app);
 }
 
-// تهيئة تطبيق Firebase فقط إذا لم يكن قد تم تهيئته من قبل.
-// هذا يمنع حدوث أخطاء أثناء إعادة التحميل السريع في بيئة التطوير.
-if (!getApps().length) {
-  try {
-    initializeApp({
-      credential: cert(serviceAccount)
-    });
-    console.log("Firebase Admin SDK initialized successfully.");
-  } catch (error) {
-    console.error("Error initializing Firebase Admin SDK:", error);
-    // إيقاف التشغيل إذا فشلت تهيئة SDK
-    throw new Error('Could not initialize Firebase Admin SDK. Please check your service account credentials.');
-  }
+export function getAdminDb() {
+    const app = getInitializedApp();
+    if (!app) {
+        throw new Error('Firebase Admin SDK is not available. Check server logs for initialization errors.');
+    }
+    return getFirestore(app);
 }
-
-// تصدير خدمات Firebase Admin المهيأة لاستخدامها في الواجهات البرمجية (API Routes)
-const adminAuth = getAuth();
-const adminDb = getFirestore();
-
-export { adminAuth, adminDb };

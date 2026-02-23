@@ -1,7 +1,11 @@
-import { adminAuth, adminDb } from '../../firebase/server.js';
+
+import { getAdminAuth, getAdminDb } from '../../firebase/server.js';
 
 export async function POST({ request }) {
   try {
+    const adminAuth = getAdminAuth();
+    const adminDb = getAdminDb();
+
     // 1. استخراج التوكن والمصادقة عليه
     const idToken = request.headers.get('Authorization')?.split('Bearer ')[1];
     if (!idToken) {
@@ -49,6 +53,8 @@ export async function POST({ request }) {
     let errorMessage = 'Internal Server Error: Could not delete user.';
     if (error.code === 'auth/user-not-found') {
         errorMessage = 'User not found in Authentication. The user may have been already deleted.';
+    } else if (error.message.includes('Firebase Admin SDK is not available')) {
+        errorMessage = 'Firebase Admin SDK initialization failed on the server. Check environment variables.';
     }
     return new Response(JSON.stringify({ error: errorMessage, details: error.message }), { status: 500 });
   }

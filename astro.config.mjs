@@ -1,12 +1,14 @@
 import { defineConfig } from 'astro/config';
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
-import vercel from "@astrojs/vercel";
+import node from "@astrojs/node";
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.elemancompany.net',
-  output: 'server',
-  adapter: vercel(), 
-  integrations: [tailwind(), react()]
+  output: 'server', // Set to 'server' for SSR
+  adapter: node({
+    mode: 'standalone'
+  }),
+  integrations: [tailwind(), react()],
 });

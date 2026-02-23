@@ -1,43 +1,34 @@
 
-// Import the potentially null db instance
-import { db } from "../../firebase/admin";
-import admin from "firebase-admin";
+import { getAdminDb } from '../../firebase/server.js';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export async function POST({ request }) {
-    // CRITICAL CHECK: If the db connection failed during startup, refuse to proceed.
-    if (!db) {
-        console.error("❌ API Error: Cannot process request because the database connection (db) is null.");
-        return new Response(JSON.stringify({
-            message: "Server configuration error.",
-            error: "The database connection is not available. Check the server logs for Firebase initialization errors."
-        }), { status: 500 });
-    }
-
     try {
-        const { projectId, supervisorId, supervisorName } = await request.json();
+        const adminDb = getAdminDb();
+        const { projectId, supervisorId } = await request.json();
 
-        if (!projectId || !supervisorId || !supervisorName) {
-            return new Response(JSON.stringify({ message: "Incomplete data provided.", error: "Missing projectId, supervisorId, or supervisorName." }), { status: 400 });
+        if (!projectId || !supervisorId) {
+            return new Response(JSON.stringify({ error: "Incomplete data provided. Missing projectId or supervisorId." }), { status: 400 });
         }
 
-        const projectRef = db.collection("projects").doc(projectId);
+        const projectRef = adminDb.collection("projects").doc(projectId);
+        
+        // Atomically add the new supervisor ID to the `supervisorIds` array.
+        await projectRef.update({
+            supervisorIds: FieldValue.arrayUnion(supervisorId)
+        });
 
-        // The robust `set` with `merge` operation.
-        await projectRef.set({
-            supervisors: admin.firestore.FieldValue.arrayUnion({
-                id: supervisorId,
-                name: supervisorName,
-            })
-        }, { merge: true });
-
-        // On success, return a clear success message.
         return new Response(JSON.stringify({ message: "Supervisor assigned successfully!" }), { status: 200 });
 
     } catch (error) {
         console.error("API Error during supervisor assignment:", error);
+         let errorMessage = "An internal error occurred during the assignment process.";
+         if (error.message.includes('Firebase Admin SDK is not available')) {
+            errorMessage = 'Firebase Admin SDK initialization failed on the server. Check environment variables.';
+        }
         return new Response(JSON.stringify({ 
-            message: "An internal error occurred during the assignment process.",
-            error: error.message 
+            error: errorMessage, 
+            details: error.message 
         }), { status: 500 });
     }
 }

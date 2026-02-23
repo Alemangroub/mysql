@@ -1,4 +1,7 @@
-const { db } = require("../../../firebase/admin");
+
+export const prerender = false;
+
+import { getAdminDb } from "../../../firebase/server.js";
 
 // This is an API route in Astro, designed to run securely on the server.
 // It receives a project ID, fetches its details from Firestore using the Admin SDK,
@@ -8,24 +11,25 @@ export async function GET({ params }) {
     const { id } = params;
 
     if (!id) {
-        return new Response(JSON.stringify({ message: "Project ID is required" }), { status: 400 });
+        return new Response(JSON.stringify({ error: "Project ID is required" }), { status: 400 });
     }
 
     try {
-        const projectDoc = await db.collection('projects').doc(id).get();
+        const adminDb = getAdminDb();
+        const projectDoc = await adminDb.collection('projects').doc(id).get();
 
         if (!projectDoc.exists) {
-            return new Response(JSON.stringify({ message: "Project not found" }), { status: 404 });
+            return new Response(JSON.stringify({ error: "Project not found" }), { status: 404 });
         }
 
         const projectData = projectDoc.data();
 
         // Fetch related data concurrently for better performance.
         const [supervisorsSnap, expensesSnap, dailyReportsSnap, leftoversSnap] = await Promise.all([
-            Promise.all((projectData.supervisorIds || []).map(sid => db.collection('users').doc(sid).get())),
-            db.collection('daily_expenses').where('projectId', '==', id).where('isRead', '==', false).get(),
-            db.collection('daily_reports').where('projectId', '==', id).where('isRead', '==', false).get(),
-            db.collection('leftovers_reports').where('projectId', '==', id).where('isRead', '==', false).get()
+            Promise.all((projectData.supervisorIds || []).map(sid => adminDb.collection('users').doc(sid).get())),
+            adminDb.collection('daily_expenses').where('projectId', '==', id).where('isRead', '==', false).get(),
+            adminDb.collection('daily_reports').where('projectId', '==', id).where('isRead', '==', false).get(),
+            adminDb.collection('leftovers_reports').where('projectId', '==', id).where('isRead', '==', false).get()
         ]);
 
         const supervisorNames = supervisorsSnap.map(doc => doc.exists ? doc.data().name : 'مشرف محذوف');
@@ -47,6 +51,10 @@ export async function GET({ params }) {
 
     } catch (error) {
         console.error("API Route Error fetching project details:", error);
-        return new Response(JSON.stringify({ message: "Internal Server Error" }), { status: 500 });
+        let errorMessage = "Internal Server Error";
+        if (error.message.includes('Firebase Admin SDK is not available')) {
+            errorMessage = 'Firebase Admin SDK initialization failed on the server. Check environment variables.';
+        }
+        return new Response(JSON.stringify({ error: errorMessage, details: error.message }), { status: 500 });
     }
 }

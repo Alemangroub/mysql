@@ -1,29 +1,27 @@
 
-import { db } from '../../firebase/admin';
+import { getAdminDb } from '../../firebase/server.js';
 import { Timestamp } from 'firebase-admin/firestore';
 
-// Using POST for simplicity as it's the default for Astro form submissions.
 export async function POST({ request }) {
-    // Ensure the request is JSON
     if (request.headers.get("Content-Type") !== "application/json") {
-        return new Response(JSON.stringify({ error: "JSON body expected" }), { status: 400 });
-    }
-
-    const { projectId, itemId, ...updates } = await request.json();
-
-    if (!projectId || !itemId) {
-        return new Response(JSON.stringify({ error: "Project ID and Item ID are required" }), { status: 400 });
-    }
-     if (!updates.name || !updates.personName || !updates.quantity || !updates.unitPrice || !updates.createdAt) {
-        return new Response(JSON.stringify({ error: 'يرجى ملء جميع الحقول المطلوبة.' }), { status: 400 });
+        return new Response(JSON.stringify({ error: "JSON body expected" }), { status: 415 });
     }
 
     try {
-        const itemRef = db.collection('projects').doc(projectId).collection('items').doc(itemId);
+        const adminDb = getAdminDb();
+        const { projectId, itemId, ...updates } = await request.json();
+
+        if (!projectId || !itemId) {
+            return new Response(JSON.stringify({ error: "Project ID and Item ID are required" }), { status: 400 });
+        }
+         if (!updates.name || !updates.personName || !updates.quantity || !updates.unitPrice || !updates.createdAt) {
+            return new Response(JSON.stringify({ error: 'يرجى ملء جميع الحقول المطلوبة.' }), { status: 400 });
+        }
+
+        const itemRef = adminDb.collection('projects').doc(projectId).collection('items').doc(itemId);
 
         const dataToUpdate = { ...updates };
 
-        // Ensure numeric fields are stored as numbers
         const quantity = parseFloat(updates.quantity);
         const unitPrice = parseFloat(updates.unitPrice);
 
@@ -33,24 +31,16 @@ export async function POST({ request }) {
 
         dataToUpdate.quantity = quantity;
         dataToUpdate.unitPrice = unitPrice;
-
-        // Recalculate total price on the server to ensure accuracy
         dataToUpdate.totalPrice = quantity * unitPrice;
-        
-        // Convert date string back to a Firestore Timestamp
         dataToUpdate.createdAt = Timestamp.fromDate(new Date(updates.createdAt));
 
-        // Atomically update the document
         await itemRef.update(dataToUpdate);
 
-        // Retrieve the fully updated document to send back to the client
         const updatedDoc = await itemRef.get();
         const finalData = updatedDoc.data();
         
-        // Convert timestamp back to a user-friendly string format for the client
-        finalData.createdAt = finalData.createdAt.toDate().toLocaleDateString('en-CA'); // YYYY-MM-DD
+        finalData.createdAt = finalData.createdAt.toDate().toLocaleDateString('en-CA'); 
         finalData.id = updatedDoc.id;
-
 
         return new Response(JSON.stringify({ 
             success: true, 
@@ -60,6 +50,10 @@ export async function POST({ request }) {
 
     } catch (error) {
         console.error("Error updating item:", error);
-        return new Response(JSON.stringify({ error: 'حدث خطأ أثناء تحديث البند في قاعدة البيانات.' }), { status: 500 });
+        let errorMessage = "حدث خطأ أثناء تحديث البند في قاعدة البيانات.";
+        if (error.message.includes('Firebase Admin SDK is not available')) {
+            errorMessage = 'Firebase Admin SDK initialization failed on the server. Check environment variables.';
+        }
+        return new Response(JSON.stringify({ error: errorMessage, details: error.message }), { status: 500 });
     }
 }
