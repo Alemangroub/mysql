@@ -1,34 +1,17 @@
 {
-  "hosting": {
-    "source": ".",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
+  "apphosting": {
+    "backends": [
+      {
+        "id": "elemancompany",
+        "region": "us-central1"
+      }
     ],
-    "frameworksBackend": {
-      "region": "europe-west1"
+    "serving": {
+      "backendId": "elemancompany",
+      "public": "dist/client"
+    },
+    "build": {
+      "run": "npm run build"
     }
-  },
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "disallowLegacyRuntimeConfig": true,
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run lint"
-      ]
-    }
-  ]
+  }
 }
