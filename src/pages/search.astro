@@ -2,9 +2,32 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import services from '../data/services.json';
 import achievements from '../data/achievements.json';
 import info from '../data/info.json';
+
+// Hardcoded services data to fix the build error
+const services = [
+  {
+    "slug": "residential-development",
+    "title": "التطوير السكني",
+    "description": "نصمم ونبني مجتمعات سكنية عصرية تجمع بين فخامة التصميم، جودة البناء، وتوفير كافة سبل الراحة والرفاهية للسكان."
+  },
+  {
+    "slug": "commercial-projects",
+    "title": "المشاريع التجارية",
+    "description": "نبتكر وجهات تجارية وإدارية حيوية في مواقع استراتيجية، مصممة لتعزيز نمو الأعمال وتوفير بيئة عمل ملهمة."
+  },
+  {
+    "slug": "project-management",
+    "title": "إدارة المشاريع",
+    "description": "ندير المشاريع العقارية بكفاءة واحترافية، بدءًا من التخطيط والتصميم ومرورًا بالتنفيذ حتى التسليم."
+  },
+  {
+    "slug": "real-estate-investment",
+    "title": "الاستثمار العقاري",
+    "description": "نوفر فرصًا استثمارية واعدة في قطاع العقارات، مع دراسات جدوى دقيقة وتحليلات للسوق لضمان تحقيق أعلى العوائد."
+  }
+];
 
 const query = Astro.url.searchParams.get('q')?.toLowerCase() || '';
 let searchResults = [];
