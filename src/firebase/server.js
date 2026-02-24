@@ -11,7 +11,7 @@ function getInitializedApp() {
     }
 
     // If not initialized, try to initialize.
-    const serviceAccountString = import.meta.env.FIREBASE_SERVICE_ACCOUNT;
+    const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT;
     
     // During the build process (`astro build`), this variable might not be available.
     // We return null so the build doesn't crash.

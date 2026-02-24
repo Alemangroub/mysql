@@ -19,39 +19,29 @@ This application is a web-based project management dashboard named "Elemannet". 
 
 #### 2.2.1. Project & Supervisor Management
 
--   **Admin Dashboard (`/admin/projects`):**
-    -   Displays a list of all current projects in a grid of cards.
-    -   Each project card shows the project name, client name, and city.
-
--   **Add New Project (`/admin/add-project`):**
-    -   A user-friendly form to create a new project.
-
--   **Project Details Page (`/admin/projects/[id]`):**
-    -   Provides a central hub for a single project with navigation to its various sections.
-
--   **Project Items (البنود) Management (`/admin/projects/[id]/items`):**
-    -   **Fully Responsive Design:** The layout is optimized for all screen sizes, with a card-based view on mobile.
-    -   **Client-Side Operations:** All CRUD operations are handled on the client-side for a fast, seamless experience.
-    -   **Data Filtering & Export:** Includes dynamic filtering and options to export data.
-
--   **Project Suppliers (الواردات) Management (`/admin/projects/[id]/suppliers`):**
-    -   **Client-Side Data Handling:** All operations are handled on the client-side for a fast and responsive experience.
+-   **Admin Dashboard (`/admin/projects`):** Displays a list of all current projects.
+-   **Add New Project (`/admin/add-project`):** A form to create a new project.
+-   **Project Details Page (`/admin/projects/[id]`):** A central hub for a single project.
+-   **Project Items (البنود) Management (`/admin/projects/[id]/items`):** Client-side CRUD operations with filtering and export.
+-   **Project Suppliers (الواردات) Management (`/admin/projects/[id]/suppliers`):** Client-side data handling.
 
 #### 2.2.2. Customer Contract & Installment Management
 
--   **Project Contracts Dashboard (`/admin/project-installments`):**
-    -   **Fully Responsive Design:** Optimized for all screen sizes. On mobile, header controls and contract cards stack vertically for improved readability and usability.
-    -   Provides a summary of total contracts, total amounts, and paid amounts for a specific project.
-    -   Lists all customer contracts within the project, linking to a detailed view for each.
+-   **Project Contracts Dashboard (`/admin/project-installments`):** A responsive dashboard summarizing contracts and payments for a project.
+-   **Contract Details Page (`/admin/contract-details`):** Displays a complete summary of a single contract and its installment schedule.
+-   **Installment Notifications (`/admin/notifications`):** Automatically displays overdue and upcoming installments.
 
--   **Contract Details Page (`/admin/contract-details`):**
-    -   Displays a complete summary of a single contract and its installment schedule.
-    -   Allows admins to manage installment statuses.
+#### 2.2.3. Expense Report Management
 
--   **Installment Notifications (`/admin/notifications`):**
-    -   Automatically displays overdue and upcoming installments for a project.
+-   **Expense Reports Page (`/admin/projects/[id]/expense-reports`):**
+    -   Displays a list of all expense reports for a project.
+    -   **Full Edit Functionality:** Administrators can now edit expense reports directly.
+    -   **View/Edit Modes:** Each report card has a "View Mode" for display and an "Edit Mode" with a form to correct item names, amounts, and notes.
+    -   **Data Structure Correction:** The update logic now saves data in a clean, structured `items` array, fixing the root cause of the "name-as-amount" bug.
+    -   **Legacy Data Handling:** Reports with the old data bug are intelligently displayed with "بند غير مسمى" (Unnamed Item) for clarity.
+    -   **Real-time Total Calculation:** The total amount is recalculated instantly as amounts are edited in the form.
 
-#### 2.2.3. Security & Authentication
+#### 2.2.4. Security & Authentication
 
 -   **Role-Based Access Control:** All `/admin/...` sections are protected and accessible only by authenticated administrators.
 -   **Secure Admin Login (`/admin`):** A dedicated login portal for administrators.
@@ -59,19 +49,17 @@ This application is a web-based project management dashboard named "Elemannet". 
 
 ## 3. Previous Tasks
 
-1.  **Fix "Items" Page Form Submission & Refine UX:** Refactored the "Items" page to use client-side form submission, resolving a server error and improving the user experience by implementing an automatic page reload after adding a new item.
+1.  **Fix Expense Report Data & Implement Edit Functionality:**
+    -   **Problem:** Expense report items were displaying amounts instead of names.
+    -   **Action:** Investigated and found the root cause was an incorrect data structure being saved and a complete lack of an editing interface on the `/admin/projects/[id]/expense-reports` page.
+    -   **Solution:** Implemented a full "Edit Mode" for each report, allowing administrators to correct item names and amounts. The backend logic was rewritten to handle a proper `items` array, and the UI was updated to support toggling between view and edit states. Pushed all changes to GitHub for automatic deployment.
 
-2.  **Implement Responsive Design for "Items" Page:** Converted the data table on the "Items" page into a responsive, card-based layout for mobile devices and adjusted header controls for better usability on small screens.
+2.  **Implement Responsive Design for "Project Contracts" Page:** Converted the layout to be fully responsive, with vertically stacked controls and cards on mobile devices.
 
-## 4. Current Task: Implement Responsive Design for "Project Contracts" Page
+3.  **Fix "Items" Page Form Submission & Refine UX:** Refactored the "Items" page to use client-side form submission, resolving a server error and improving the user experience by implementing an automatic page reload after adding a new item.
 
-### Plan & Steps for the requested change:
+4.  **Implement Responsive Design for "Items" Page:** Converted the data table on the "Items" page into a responsive, card-based layout for mobile devices.
 
-1.  **[Identify File]** Located the correct file for the page at `src/pages/admin/project-installments.astro`.
-2.  **[Analyze Layout]** Reviewed the existing layout to identify areas for mobile improvement, specifically the header and the list of contract cards.
-3.  **[Implement Responsive CSS]** Added a `@media (max-width: 768px)` block to the page's stylesheet.
-4.  **[Adjust Header and Cards]** 
-    -   Modified the page header and action buttons to stack vertically on small screens.
-    -   Restyled the individual contract cards (`.contract-item`) to arrange the sub-details vertically, making them easier to read on narrow displays.
-    -   Adjusted spacing and font sizes for a polished mobile experience.
-5.  **[Update Blueprint]** Updated this `blueprint.md` file to document the implementation of the fully responsive design for the "Project Contracts" page.
+## 4. Current Task
+
+The application is currently in a stable state with all requested features implemented and bugs fixed. Awaiting the next user request.
