@@ -30,11 +30,15 @@ import AdminLogin from '../../components/AdminLogin.astro';
                      <div class="form-group">
                         <label for="unit-type">نوع الوحدة</label>
                         <select id="unit-type" name="unitType" required>
-                            <option value="apartment">شقة</option>
-                            <option value="shop">محل</option>
-                            <option value="basement">بدروم</option>
+                            <option value="شقة">شقة</option>
+                            <option value="محل">محل</option>
+                            <option value="بدروم">بدروم</option>
                             <option value="other">أخرى</option>
                         </select>
+                    </div>
+                    <div class="form-group" id="other-unit-type-group" style="display: none;">
+                        <label for="other-unit-type">نوع الوحدة (أخرى)</label>
+                        <input type="text" id="other-unit-type" name="otherUnitType">
                     </div>
                     <div class="form-group">
                         <label for="unit-location">موقع/رقم الوحدة</label>
@@ -107,6 +111,10 @@ import AdminLogin from '../../components/AdminLogin.astro';
     .simple-form-grid { display: grid; grid-template-columns: 1fr; gap: 1.2rem; }
     @media (min-width: 768px) {
         .simple-form-grid { grid-template-columns: 1fr 1fr; }
+        /* Ensure 'other' unit type field spans full width when visible */
+        #other-unit-type-group {
+            grid-column: 1 / -1; 
+        }
     }
 
     .form-group { display: flex; flex-direction: column; }
@@ -199,8 +207,27 @@ import AdminLogin from '../../components/AdminLogin.astro';
         document.getElementById('total-amount').addEventListener('input', updateRemainingAmount);
         document.getElementById('down-payment').addEventListener('input', updateRemainingAmount);
         document.getElementById('number-of-installments').addEventListener('change', generateInstallmentFields);
+
+        // New: Event listener for the unit type dropdown
+        document.getElementById('unit-type').addEventListener('change', handleUnitTypeChange);
         
         updateRemainingAmount();
+        handleUnitTypeChange(); // Call once on init to set initial state
+    }
+
+    function handleUnitTypeChange() {
+        const unitTypeSelect = document.getElementById('unit-type');
+        const otherUnitTypeGroup = document.getElementById('other-unit-type-group');
+        const otherUnitTypeInput = document.getElementById('other-unit-type');
+
+        if (unitTypeSelect.value === 'other') {
+            otherUnitTypeGroup.style.display = 'block';
+            otherUnitTypeInput.required = true;
+        } else {
+            otherUnitTypeGroup.style.display = 'none';
+            otherUnitTypeInput.required = false;
+            otherUnitTypeInput.value = ''; // Clear the value when hidden
+        }
     }
 
     function updateRemainingAmount() {
@@ -230,12 +257,10 @@ import AdminLogin from '../../components/AdminLogin.astro';
             const row = document.createElement('div');
             row.className = 'installment-row';
 
-            // --- Name Label ---
             const nameLabel = document.createElement('label');
             nameLabel.textContent = `القسط ${i + 1}`;
             nameLabel.style.fontWeight = 'bold';
 
-            // --- Amount Input ---
             const amountGroup = document.createElement('div');
             amountGroup.className = 'installment-input-group';
             const amountLabel = document.createElement('label');
@@ -249,7 +274,6 @@ import AdminLogin from '../../components/AdminLogin.astro';
             amountGroup.appendChild(amountLabel);
             amountGroup.appendChild(amountInput);
 
-            // --- Due Date Input ---
             const dateGroup = document.createElement('div');
             dateGroup.className = 'installment-input-group';
             const dateLabel = document.createElement('label');
@@ -261,7 +285,6 @@ import AdminLogin from '../../components/AdminLogin.astro';
             dateGroup.appendChild(dateLabel);
             dateGroup.appendChild(dateInput);
 
-            // --- Status Select ---
             const statusGroup = document.createElement('div');
             statusGroup.className = 'installment-input-group';
             const statusLabel = document.createElement('label');
@@ -288,8 +311,19 @@ import AdminLogin from '../../components/AdminLogin.astro';
         submitBtn.textContent = 'جارٍ إنشاء العقد...';
 
         const formData = new FormData(e.target);
-        const customerName = formData.get('customerName');
         const numberOfInstallments = parseInt(formData.get('numberOfInstallments'));
+
+        // --- Determine Unit Type ---
+        let unitType = formData.get('unitType');
+        if (unitType === 'other') {
+            unitType = formData.get('otherUnitType').trim();
+            if (!unitType) {
+                 alert('الرجاء إدخال نوع الوحدة في الحقل المخصص.');
+                 submitBtn.disabled = false;
+                 submitBtn.textContent = 'إنشاء العقد';
+                 return;
+            }
+        }
 
         // --- Firestore Operations ---
         const contractData = {
@@ -297,14 +331,13 @@ import AdminLogin from '../../components/AdminLogin.astro';
             customerName: formData.get('customerName'),
             customerPhone: formData.get('customerPhone'),
             totalAmount: parseInt(formData.get('totalAmount').replace(/[^0-9]/g, '')) || 0,
-            unitType: formData.get('unitType'),
+            unitType: unitType, // Use the determined unit type
             unitLocation: formData.get('unitLocation'),
         };
         const downPayment = parseInt(formData.get('downPayment').replace(/[^0-9]/g, '')) || 0;
 
         const batch = writeBatch(db);
 
-        // Add down payment if it exists
         if (downPayment > 0) {
             const downPaymentRef = doc(collection(db, 'installments'));
             batch.set(downPaymentRef, {
@@ -317,7 +350,6 @@ import AdminLogin from '../../components/AdminLogin.astro';
             });
         }
 
-        // Add the custom installments
         for (let i = 0; i < numberOfInstallments; i++) {
             const installmentRef = doc(collection(db, 'installments'));
             const status = formData.get(`installment_status_${i}`);
