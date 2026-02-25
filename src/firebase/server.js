@@ -13,29 +13,24 @@ function getInitializedApp() {
         return getApps()[0];
     }
 
-    // Read credentials from Astro's environment variables
-    const serviceAccount = {
-      projectId: import.meta.env.FIREBASE_PROJECT_ID,
-      clientEmail: import.meta.env.FIREBASE_CLIENT_EMAIL,
-      // The private key from environment variables often has escaped newlines.
-      // We need to replace them with actual newline characters.
-      privateKey: import.meta.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    };
+    // Read the consolidated credentials from the single environment variable.
+    const serviceAccountJSON = import.meta.env.FIREBASE_ADMIN_SDK_CONFIG;
 
-    // Verify that all required credentials are present.
-    if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
+    if (!serviceAccountJSON) {
         console.error(
             '\n❌ [server.js] FIREBASE ADMIN SDK INITIALIZATION FAILED ❌\n' +
-            'One or more required environment variables are missing.\n' +
-            'Please ensure FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY are set in your deployment environment.\n'
+            'The FIREBASE_ADMIN_SDK_CONFIG environment variable is missing.\n' +
+            'Please ensure this secret is set in your deployment environment.\n'
         );
-        // Return null if setup is incomplete to avoid crashing the server.
         return null;
     }
 
     try {
-        // Initialize the Firebase Admin SDK with the credentials.
-        console.log('[server.js] Initializing Firebase Admin SDK...');
+        // Parse the JSON string from the environment variable to get the service account object.
+        const serviceAccount = JSON.parse(serviceAccountJSON);
+
+        // Initialize the Firebase Admin SDK with the credentials object.
+        console.log('[server.js] Initializing Firebase Admin SDK from config secret...');
         const app = initializeApp({
             credential: cert(serviceAccount)
         });
@@ -43,6 +38,7 @@ function getInitializedApp() {
         return app;
     } catch (error) {
         console.error('❌ [server.js] Firebase Admin SDK initialization threw an error:', error);
+        // This could be a JSON parsing error or an SDK initialization error.
         return null;
     }
 }
