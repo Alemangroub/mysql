@@ -2,7 +2,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import AdminLogin from '../../components/AdminLogin.astro';
----
+--- 
 
 <Layout title="إدارة المشروعات">
   <div id="auth-loading-message" class="auth-container">
@@ -21,6 +21,10 @@ import AdminLogin from '../../components/AdminLogin.astro';
         <h1>إدارة المشروعات</h1>
         <div class="header-actions">
           <a href="/admin/add-project" class="btn btn-primary">+ إضافة مشروع جديد</a>
+          <button id="installments-notification-btn" class="btn btn-info"> 
+            تنبيهات الأقساط
+            <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+          </button>
           <a href="/admin/archived-projects" class="btn btn-secondary">المشاريع المؤرشفة</a>
           <button id="logout-button" class="btn btn-danger">تسجيل الخروج</button>
         </div>
@@ -53,6 +57,20 @@ import AdminLogin from '../../components/AdminLogin.astro';
       </div>
 
     </div>
+
+    <!-- Installments Notifications Modal -->
+    <div id="installments-modal" class="modal-overlay">
+      <div class="modal-box large">
+        <h3>تنبيهات الأقساط</h3>
+        <div id="installments-notification-content">
+          <!-- Notifications will be loaded here -->
+        </div>
+        <div class="modal-actions">
+          <button id="close-installments-modal-btn" class="btn btn-secondary">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
 
     <!-- Archive Confirmation Modal -->
     <div id="archive-modal" class="modal-overlay">
@@ -121,7 +139,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
   /* Header */
   .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e0e0e0; }
   .page-header h1 { font-size: 2.2rem; color: #333; font-weight: 900; }
-  .header-actions { display: flex; gap: 1rem; }
+  .header-actions { display: flex; gap: 1rem; align-items: center;}
 
   /* Search Input */
   .search-container {
@@ -181,7 +199,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
   #no-projects-message { text-align: center; padding: 2rem 0; font-size: 1.1rem; color: #777; }
 
   /* General Button Styles */
-  .btn { display: inline-block; padding: 0.7rem 1.3rem; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; transition: all 0.2s ease-in-out; text-align: center; border: 1px solid transparent; cursor: pointer; }
+  .btn { position:relative; display: inline-block; padding: 0.7rem 1.3rem; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; transition: all 0.2s ease-in-out; text-align: center; border: 1px solid transparent; cursor: pointer; }
   .btn:hover { transform: translateY(-2px); }
   .btn.btn-small { padding: 0.5rem 1rem; font-size: 0.85rem; }
   .btn-primary { background-color: #3f51b5; border-color: #3f51b5; }
@@ -192,7 +210,21 @@ import AdminLogin from '../../components/AdminLogin.astro';
   .btn-danger:hover { background-color: #c9302c; }
    .btn-warning { background-color: #f0ad4e; border-color: #eea236; color: #fff;}
   .btn-warning:hover { background-color: #ec971f; border-color: #d58512; }
+  .btn-info { background-color: #17a2b8; border-color: #17a2b8; color: #fff; }
+  .btn-info:hover { background-color: #138496; border-color: #117a8b; }
   .btn-action-cell { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;}
+
+  .notification-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: #dc3545;
+      color: white;
+      border-radius: 50%;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+  }
 
   .btn-delete-custom, .btn-edit-custom, .btn-installments-custom, .btn-archive-custom {
       background-color: transparent;
@@ -217,11 +249,52 @@ import AdminLogin from '../../components/AdminLogin.astro';
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); z-index: 1000; visibility: hidden; opacity: 0; transition: opacity 0.3s ease; overflow-y: auto; padding: 2rem 1rem; display: flex; align-items: center; justify-content: center; }
   .modal-overlay.visible { visibility: visible; opacity: 1; }
   .modal-box { background: #fff; padding: 2.5rem; border-radius: 12px; width: 100%; max-width: 550px; text-align: right; margin: auto; transform: scale(0.95); transition: transform 0.3s ease; }
+  .modal-box.large { max-width: 800px; }
   .modal-overlay.visible .modal-box { transform: scale(1); }
   .modal-box h3 { font-size: 1.8rem; margin-top: 0; margin-bottom: 2rem; color: #333; text-align: center; font-weight: 800; }
   .modal-box p { margin-bottom: 2rem; color: #666; text-align: center; }
   .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
   .modal-actions .btn { min-width: 120px; }
+
+  #installments-notification-content h4 { 
+    font-size: 1.5rem; 
+    color: #c9302c; 
+    border-bottom: 2px solid #c9302c;
+    padding-bottom: 0.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  #installments-notification-content h4.upcoming-title {
+      color: #f0ad4e;
+      border-bottom-color: #f0ad4e;
+  }
+  #installments-notification-content h4:first-child { margin-top: 0; }
+  
+  .installment-notification-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .installment-notification-item {
+    background-color: #fdfdfe; 
+    padding: 1rem; 
+    border-radius: 8px; 
+    margin-bottom: 1rem; 
+    border-right: 5px solid #c9302c;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .installment-notification-item-link:hover .installment-notification-item {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  }
+
+  .installment-notification-item.upcoming {
+      border-right-color: #f0ad4e;
+  }
+  .notification-item-details { font-size: 1rem; color: #333; line-height: 1.6; }
+  .notification-item-details strong { color: #555; }
+  .status-overdue { color: #c9302c; font-weight: bold; }
+  .status-upcoming { color: #f0ad4e; font-weight: bold; }
 
   /* Edit Form Styles */
   #edit-form { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -255,10 +328,11 @@ import AdminLogin from '../../components/AdminLogin.astro';
 <script>
   import { auth, db } from '../../firebase/client';
   import { onAuthStateChanged, signOut } from "firebase/auth";
-  import { collection, onSnapshot, doc, deleteDoc, updateDoc, getDoc, getDocs, query, where, orderBy } from 'firebase/firestore';
+  import { collection, onSnapshot, doc, deleteDoc, updateDoc, getDoc, getDocs, query, where, orderBy, Timestamp } from 'firebase/firestore';
 
   let allProjects = [];
   let allSupervisors = [];
+  const formatCurrency = (num) => (num || 0).toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' });
 
   document.addEventListener('DOMContentLoaded', () => {
       const authLoadingMessage = document.getElementById('auth-loading-message');
@@ -337,12 +411,143 @@ import AdminLogin from '../../components/AdminLogin.astro';
       }
   }
 
+  // --- MODAL VISIBILITY ---
+  function showModal(modal) { modal.classList.add('visible'); document.body.style.overflow = 'hidden'; }
+  function hideModal(modal) { modal.classList.remove('visible'); document.body.style.overflow = ''; }
+
+  async function fetchInstallmentNotifications() {
+    const badge = document.getElementById('notification-badge');
+    const notificationContent = document.getElementById('installments-notification-content');
+    notificationContent.innerHTML = '<p>جاري تحميل التنبيهات...</p>';
+
+    try {
+        const projectsQuery = query(collection(db, 'projects'));
+        const projectsSnapshot = await getDocs(projectsQuery);
+        const projectsMap = new Map();
+        projectsSnapshot.forEach(doc => {
+            projectsMap.set(doc.id, { name: doc.data().projectName, archived: doc.data().archived });
+        });
+
+        const MS_PER_DAY = 1000 * 60 * 60 * 24;
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+
+        const q = query(collection(db, 'installments'), where('status', '==', 'pending'));
+        const querySnapshot = await getDocs(q);
+
+        const allPending = querySnapshot.docs.map(d => {
+            const data = d.data();
+            const projectInfo = projectsMap.get(data.projectId);
+            return {
+                ...data,
+                projectName: projectInfo ? projectInfo.name : 'مشروع غير معروف',
+                projectArchived: projectInfo ? projectInfo.archived : true
+            };
+        }).filter(inst => !inst.projectArchived);
+
+        const overdue = [];
+        const upcoming = [];
+
+        allPending.forEach(inst => {
+            const dueDate = inst.dueDate.toDate();
+            dueDate.setHours(0, 0, 0, 0);
+            const diffDays = Math.round((dueDate - startOfToday) / MS_PER_DAY);
+
+            if (diffDays < 0) {
+                overdue.push({ ...inst, days: Math.abs(diffDays) });
+            } else if (diffDays >= 0 && diffDays <= 7) {
+                upcoming.push({ ...inst, days: diffDays });
+            }
+        });
+        
+        overdue.sort((a, b) => b.days - a.days); // Show most overdue first
+        upcoming.sort((a, b) => a.days - b.days); // Show nearest first
+
+        const notificationCount = overdue.length + upcoming.length;
+        if (notificationCount > 0) {
+            badge.textContent = notificationCount;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+
+        let contentHTML = '';
+        if (overdue.length > 0) {
+            contentHTML += '<h4>أقساط مستحقة</h4>';
+            overdue.forEach(inst => {
+                let dayWord;
+                if (inst.days === 1) dayWord = 'يوم';
+                else if (inst.days === 2) dayWord = 'يومين';
+                else if (inst.days >= 3 && inst.days <= 10) dayWord = 'أيام';
+                else dayWord = 'يومًا';
+
+                const statusText = `متأخر ${inst.days} ${dayWord}`;
+
+                contentHTML += `
+                  <a href="/admin/contract-details?projectId=${inst.projectId}&customerName=${encodeURIComponent(inst.customerName)}" class="installment-notification-item-link">
+                    <div class="installment-notification-item overdue">
+                      <div class="notification-item-details">
+                        <strong>المشروع:</strong> ${inst.projectName}<br>
+                        <strong>العميل:</strong> ${inst.customerName}<br>
+                        <strong>موبايل:</strong> ${inst.customerPhone || 'غير مسجل'}<br>
+                        <strong>رقم الدور:</strong> ${inst.unitLocation || 'غير محدد'}<br>
+                        <strong>المبلغ:</strong> ${formatCurrency(inst.installmentAmount)}<br>
+                        <strong>تاريخ الاستحقاق:</strong> ${inst.dueDate.toDate().toLocaleDateString('ar-EG')}<br>
+                        <strong>الحالة:</strong> <span class="status-overdue">${statusText}</span>
+                      </div>
+                    </div>
+                  </a>
+                `;
+            });
+        }
+
+        if (upcoming.length > 0) {
+            contentHTML += '<h4 class="upcoming-title">أقساط تستحق خلال 7 أيام</h4>';
+            upcoming.forEach(inst => {
+                let statusText;
+                if (inst.days === 0) statusText = 'مستحق اليوم';
+                else if (inst.days === 1) statusText = 'مستحق غداً';
+                else {
+                    const dayWord = (inst.days >= 3 && inst.days <= 10) ? 'أيام' : 'يوم';
+                    statusText = `مستحق خلال ${inst.days} ${dayWord}`;
+                }
+
+                contentHTML += `
+                  <a href="/admin/contract-details?projectId=${inst.projectId}&customerName=${encodeURIComponent(inst.customerName)}" class="installment-notification-item-link">
+                    <div class="installment-notification-item upcoming">
+                      <div class="notification-item-details">
+                        <strong>المشروع:</strong> ${inst.projectName}<br>
+                        <strong>العميل:</strong> ${inst.customerName}<br>
+                        <strong>موبايل:</strong> ${inst.customerPhone || 'غير مسجل'}<br>
+                        <strong>رقم الدور:</strong> ${inst.unitLocation || 'غير محدد'}<br>
+                        <strong>المبلغ:</strong> ${formatCurrency(inst.installmentAmount)}<br>
+                        <strong>تاريخ الاستحقاق:</strong> ${inst.dueDate.toDate().toLocaleDateString('ar-EG')}<br>
+                        <strong>الحالة:</strong> <span class="status-upcoming">${statusText}</span>
+                      </div>
+                    </div>
+                  </a>
+                `;
+            });
+        }
+
+        if (notificationCount === 0) {
+            contentHTML = '<p>لا توجد تنبيهات حالية.</p>';
+        }
+
+        notificationContent.innerHTML = contentHTML;
+
+    } catch (error) {
+        console.error("Error fetching installment notifications: ", error);
+        notificationContent.innerHTML = '<p>حدث خطأ أثناء تحميل التنبيهات.</p>';
+        badge.style.display = 'none';
+    }
+  }
+
   function initializePage() {
     // --- DOM ELEMENTS ---
     const searchInput = document.getElementById('search-input');
     const projectsList = document.getElementById('projects-list');
-    const noProjectsMessage = document.getElementById('no-projects-message');
-    const tableWrapper = document.querySelector('.table-wrapper');
+    
     // Modals
     const editModal = document.getElementById('edit-modal');
     const editForm = document.getElementById('edit-form');
@@ -350,6 +555,9 @@ import AdminLogin from '../../components/AdminLogin.astro';
     const archiveModal = document.getElementById('archive-modal');
     const confirmArchiveBtn = document.getElementById('confirm-archive-btn');
     const cancelArchiveBtn = document.getElementById('cancel-archive-btn');
+    const installmentsModal = document.getElementById('installments-modal');
+    const installmentsBtn = document.getElementById('installments-notification-btn');
+    const closeInstallmentsModalBtn = document.getElementById('close-installments-modal-btn');
 
     const projectNameInput = document.getElementById('edit-project-name');
     const projectAddressInput = document.getElementById('edit-project-address');
@@ -386,9 +594,10 @@ import AdminLogin from '../../components/AdminLogin.astro';
         renderProjects(filteredProjects);
     });
 
-    // --- MODAL VISIBILITY ---
-    function showModal(modal) { modal.classList.add('visible'); document.body.style.overflow = 'hidden'; }
-    function hideModal(modal) { modal.classList.remove('visible'); document.body.style.overflow = ''; }
+    // --- INSTALLMENTS NOTIFICATION MODAL ---
+    installmentsBtn.addEventListener('click', () => showModal(installmentsModal));
+    closeInstallmentsModalBtn.addEventListener('click', () => hideModal(installmentsModal));
+    installmentsModal.addEventListener('click', (e) => { if (e.target === installmentsModal) hideModal(installmentsModal); });
 
     // --- GENERAL EVENT LISTENER ---
     projectsList.addEventListener('click', (e) => {
@@ -509,5 +718,6 @@ import AdminLogin from '../../components/AdminLogin.astro';
 
     // --- INITIALIZATION ---
     fetchSupervisors();
+    fetchInstallmentNotifications();
   }
 </script>

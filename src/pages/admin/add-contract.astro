@@ -1,7 +1,8 @@
+
 ---
 import Layout from '../../layouts/Layout.astro';
 import AdminLogin from '../../components/AdminLogin.astro';
----
+--- 
 
 <Layout title="إضافة عقد جديد">
     <div id="auth-loading-message" class="auth-container">
@@ -25,7 +26,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
                     </div>
                     <div class="form-group">
                         <label for="customer-phone">رقم هاتف العميل</label>
-                        <input type="tel" id="customer-phone" name="customerPhone" required>
+                        <input type="tel" id="customer-phone" name="customerPhone" required pattern="[0-9]{11}" title="يجب إدخال 11 رقمًا بالضبط">
                     </div>
                      <div class="form-group">
                         <label for="unit-type">نوع الوحدة</label>
@@ -41,7 +42,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
                         <input type="text" id="other-unit-type" name="otherUnitType">
                     </div>
                     <div class="form-group">
-                        <label for="unit-location">موقع/رقم الوحدة</label>
+                        <label for="unit-location">رقم الدور</label>
                         <input type="text" id="unit-location" name="unitLocation" required>
                     </div>
                     <div class="form-group">
@@ -132,7 +133,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
     .installments-container h3 { margin-bottom: 1rem; color: var(--primary-color); }
     .installment-row {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 1rem;
         align-items: center;
         margin-bottom: 1rem;
@@ -285,21 +286,9 @@ import AdminLogin from '../../components/AdminLogin.astro';
             dateGroup.appendChild(dateLabel);
             dateGroup.appendChild(dateInput);
 
-            const statusGroup = document.createElement('div');
-            statusGroup.className = 'installment-input-group';
-            const statusLabel = document.createElement('label');
-            statusLabel.textContent = 'الحالة';
-            const statusSelect = document.createElement('select');
-            statusSelect.name = `installment_status_${i}`;
-            statusSelect.innerHTML = '<option value="pending">مستحق</option><option value="paid">مدفوع</option>';
-            statusSelect.required = true;
-            statusGroup.appendChild(statusLabel);
-            statusGroup.appendChild(statusSelect);
-
             row.appendChild(nameLabel);
             row.appendChild(amountGroup);
             row.appendChild(dateGroup);
-            row.appendChild(statusGroup);
             container.appendChild(row);
         }
     }
@@ -329,7 +318,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
         const contractData = {
             projectId: currentProjectId,
             customerName: formData.get('customerName'),
-            customerPhone: formData.get('customerPhone'),
+            customerPhone: formData.get('customerPhone').trim(),
             totalAmount: parseInt(formData.get('totalAmount').replace(/[^0-9]/g, '')) || 0,
             unitType: unitType, // Use the determined unit type
             unitLocation: formData.get('unitLocation'),
@@ -352,7 +341,6 @@ import AdminLogin from '../../components/AdminLogin.astro';
 
         for (let i = 0; i < numberOfInstallments; i++) {
             const installmentRef = doc(collection(db, 'installments'));
-            const status = formData.get(`installment_status_${i}`);
             const amountStr = formData.get(`installment_amount_${i}`).replace(/[^0-9]/g, '');
             const amount = parseInt(amountStr) || 0;
             const dueDate = new Date(formData.get(`installment_date_${i}`));
@@ -361,8 +349,8 @@ import AdminLogin from '../../components/AdminLogin.astro';
                 ...contractData,
                 installmentAmount: amount,
                 installmentName: `القسط ${i + 1}`,
-                status: status,
-                paymentDate: status === 'paid' ? Timestamp.now() : null,
+                status: 'pending',
+                paymentDate: null,
                 dueDate: Timestamp.fromDate(dueDate),
             });
         }
