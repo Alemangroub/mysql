@@ -18,17 +18,26 @@ import AdminLogin from '../../components/AdminLogin.astro';
 
       <!-- Page Header -->
       <div class="page-header">
-        <h1>إدارة المشروعات</h1>
-        <div class="header-actions">
-          <a href="/crs/add-project" class="btn btn-primary">+ إضافة مشروع جديد</a>
-          <button id="installments-notification-btn" class="btn btn-info"> 
-            تنبيهات الأقساط
-            <span id="notification-badge" class="notification-badge" style="display: none;"></span>
-          </button>
-          <a href="/crs/archived-projects" class="btn btn-secondary">المشاريع المؤرشفة</a>
-          <button id="logout-button" class="btn btn-danger">تسجيل الخروج</button>
+        <div class="header-side left">
+            <div class="dropdown">
+                <button class="btn-icon dropdown-toggle" aria-label="خيارات إضافية">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+                </button>
+                <div class="dropdown-menu">
+                    <a href="/crs/add-project" class="dropdown-item">+ إضافة مشروع جديد</a>
+                    <button id="installments-notification-btn" class="dropdown-item">
+                        تنبيهات الأقساط
+                        <span id="notification-badge" class="notification-badge" style="display: none;"></span>
+                    </button>
+                    <a href="/crs/archived-projects" class="dropdown-item">المشاريع المؤرشفة</a>
+                </div>
+            </div>
         </div>
-      </div>
+        <h1 class="page-title">إدارة المشروعات</h1>
+        <div class="header-side right">
+           <button id="logout-button" class="btn btn-danger">تسجيل الخروج</button>
+        </div>
+    </div>
 
       <!-- Search Input -->
       <div class="search-container">
@@ -137,9 +146,108 @@ import AdminLogin from '../../components/AdminLogin.astro';
   .container { max-width: 1200px; margin: 0 auto; }
   
   /* Header */
-  .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e0e0e0; }
-  .page-header h1 { font-size: 2.2rem; color: #333; font-weight: 900; }
-  .header-actions { display: flex; gap: 1rem; align-items: center;}
+  .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #e0e0e0;
+  }
+
+  .header-side {
+      flex: 1;
+      display: flex;
+  }
+
+  .header-side.left { justify-content: flex-start; }
+  .header-side.right { justify-content: flex-end; }
+
+  .page-title {
+      flex-shrink: 0; /* Prevents title from shrinking */
+      margin: 0 1rem; /* Adds space on the sides */
+      font-size: 2.2rem;
+      color: #333;
+      font-weight: 900;
+      text-align: center;
+  }
+
+  .btn-icon {
+      background-color: transparent;
+      border: 2px solid #6c757d;
+      padding: 0.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #6c757d;
+      transition: all 0.2s ease;
+  }
+
+  .btn-icon:hover, .dropdown.active .btn-icon {
+      background-color: #6c757d;
+      color: white;
+      transform: scale(1.1);
+  }
+
+  /* Dropdown Styles */
+  .dropdown {
+      position: relative;
+      display: inline-block;
+  }
+
+  .dropdown-menu {
+      position: absolute;
+      top: 120%;
+      right: 0;
+      left: auto;
+      z-index: 1000;
+      display: none;
+      min-width: 220px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      padding: 0.5rem 0;
+      list-style: none;
+      border: 1px solid #e0e0e0;
+  }
+
+  .dropdown.active .dropdown-menu {
+      display: block;
+  }
+
+  .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 0.8rem 1.5rem;
+      font-weight: 600;
+      color: #333;
+      text-align: right;
+      white-space: nowrap;
+      background-color: transparent;
+      border: 0;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .dropdown-item:hover {
+      background-color: #f4f7f6;
+      color: #3f51b5;
+  }
+
+  .dropdown-item .notification-badge {
+      position: static;
+      margin-right: auto;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+  }
+
 
   /* Search Input */
   .search-container {
@@ -212,7 +320,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
   .btn-warning:hover { background-color: #ec971f; border-color: #d58512; }
   .btn-info { background-color: #17a2b8; border-color: #17a2b8; color: #fff; }
   .btn-info:hover { background-color: #138496; border-color: #117a8b; }
-  .btn-action-cell { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;}
+  .btn-action-cell { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
 
   .notification-badge {
       position: absolute;
@@ -312,8 +420,10 @@ import AdminLogin from '../../components/AdminLogin.astro';
 
   /* Responsive Styles for Mobile */
   @media (max-width: 768px) {
-    .page-header { flex-direction: column; align-items: stretch; gap: 1rem; }
-    .header-actions { flex-direction: column; }
+    .page-header { flex-wrap: wrap; justify-content: center; }
+    .page-title { flex-basis: 100%; text-align: center; margin-bottom: 1rem; order: 1; font-size: 1.8rem;}
+    .header-side.left { order: 2; }
+    .header-side.right { order: 3; }
     #projects-table thead { display: none; }
     #projects-table, #projects-table tbody, #projects-table tr, #projects-table td { display: block; width: 100%; }
     #projects-table tr { margin-bottom: 1rem; border: 1px solid #e0e0e0; border-radius: 10px; padding: 0; }
@@ -321,6 +431,10 @@ import AdminLogin from '../../components/AdminLogin.astro';
     #projects-table td:first-of-type, #projects-table td:last-of-type { border-radius: 0; }
     #projects-table td:last-of-type { border-bottom: none; padding-top: 1.5rem; padding-bottom: 1.5rem; text-align: center; background-color: #f9f9f9; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
     #projects-table td::before { content: attr(data-label); position: absolute; left: 1rem; width: 40%; padding-right: 10px; font-weight: 700; color: #3f51b5; text-align: left; }
+    #logout-button {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.85rem;
+    }
   }
 
 </style>
@@ -466,7 +580,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
         const notificationCount = overdue.length + upcoming.length;
         if (notificationCount > 0) {
             badge.textContent = notificationCount;
-            badge.style.display = 'inline-block';
+            badge.style.display = 'inline-flex';
         } else {
             badge.style.display = 'none';
         }
@@ -568,6 +682,22 @@ import AdminLogin from '../../components/AdminLogin.astro';
     let projectIdToEdit = null;
     let projectIdToArchive = null;
 
+    // --- DROPDOWN LOGIC ---
+    const dropdown = document.querySelector('.dropdown');
+    if (dropdown) {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    }
+
     // --- DATA FETCHING & RENDERING ---
     async function fetchSupervisors() {
       const q = query(collection(db, "users"), where("role", "==", "supervisor"));
@@ -595,7 +725,11 @@ import AdminLogin from '../../components/AdminLogin.astro';
     });
 
     // --- INSTALLMENTS NOTIFICATION MODAL ---
-    installmentsBtn.addEventListener('click', () => showModal(installmentsModal));
+    installmentsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showModal(installmentsModal);
+        if (dropdown) dropdown.classList.remove('active');
+    });
     closeInstallmentsModalBtn.addEventListener('click', () => hideModal(installmentsModal));
     installmentsModal.addEventListener('click', (e) => { if (e.target === installmentsModal) hideModal(installmentsModal); });
 
