@@ -2,7 +2,7 @@
 import type { APIRoute } from 'astro';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { app } from '../../../../firebase/server';
+import { app } from '../../firebase/server';
 
 const auth = getAuth(app);
 const db = getFirestore(app);
