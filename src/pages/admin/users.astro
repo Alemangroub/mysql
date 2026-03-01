@@ -65,7 +65,42 @@ import AdminLogin from '../../components/AdminLogin.astro';
 
     </div>
 
-    <!-- Confirmation Modal -->
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <h4>تعديل بيانات المستخدم</h4>
+        <form id="edit-user-form">
+            <input type="hidden" id="edit-user-id" />
+            <div class="form-group">
+                <label for="edit-user-name">اسم المستخدم الكامل</label>
+                <input type="text" id="edit-user-name" required />
+            </div>
+            <div class="form-group">
+                <label for="edit-user-email">البريد الإلكتروني</label>
+                <input type="email" id="edit-user-email" required />
+            </div>
+            <div class="form-group">
+                <label for="edit-user-role">صلاحية المستخدم</label>
+                <select id="edit-user-role" required>
+                    <option value="admin">مسؤول (Admin)</option>
+                    <option value="supervisor">مشرف (Supervisor)</option>
+                </select>
+            </div>
+             <div class="form-group">
+                <label for="edit-user-password">كلمة سر جديدة (اختياري)</label>
+                <input type="password" id="edit-user-password" placeholder="اتركها فارغة لعدم التغيير" minlength="6" />
+            </div>
+            <p id="edit-user-feedback" class="feedback-message"></p>
+            <div class="modal-actions">
+                <button type="button" id="edit-modal-cancel-btn" class="btn btn-secondary">إلغاء</button>
+                <button type="submit" id="edit-modal-save-btn" class="btn btn-primary">حفظ التعديلات</button>
+            </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- Delete Confirmation Modal -->
     <div id="delete-confirm-modal" class="modal-overlay" style="display: none;">
       <div class="modal-content">
         <h4>تأكيد الحذف</h4>
@@ -117,19 +152,22 @@ import AdminLogin from '../../components/AdminLogin.astro';
   .user-admin-page .role-badge { display: inline-block; padding: 0.25em 0.6em; font-size: 0.8rem; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25rem; }
   .user-admin-page .role-badge.admin { color: #fff; background-color: #3f51b5; }
   .user-admin-page .role-badge.supervisor { color: #fff; background-color: #6c757d; }
-  .user-admin-page .user-card-footer { display: flex; justify-content: flex-end; align-items: center; padding-top: 1rem; }
-  .user-admin-page .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-  .user-admin-page .modal-content { background: #fff; padding: 2.5rem; border-radius: 12px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-  .user-admin-page .modal-content h4 { margin-top: 0; font-size: 1.5rem; color: #333; font-weight: 800; }
-  .user-admin-page .modal-content p { margin-bottom: 1rem; color: #555; font-size: 1.1rem; }
+  .user-admin-page .user-card-footer { display: flex; justify-content: flex-end; align-items: center; padding-top: 1rem; gap: 0.5rem;}
+  .user-admin-page .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: flex-start; justify-content: center; z-index: 1000; padding: 4rem 1rem 1rem; overflow-y: auto; }
+  .user-admin-page .modal-content { background: #fff; padding: 2.5rem; border-radius: 12px; width: 90%; max-width: 500px; text-align: right; box-shadow: 0 5px 15px rgba(0,0,0,0.3); margin-bottom: auto; }
+  .user-admin-page .modal-content h4 { margin-top: 0; font-size: 1.5rem; color: #333; font-weight: 800; text-align: center;}
+  .user-admin-page .modal-content p { margin-bottom: 1rem; color: #555; font-size: 1.1rem; text-align: center; }
   .user-admin-page .modal-actions { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
   .user-admin-page .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.7rem 1.3rem; color: #fff; text-decoration: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; transition: all 0.2s ease-in-out; text-align: center; border: 1px solid transparent; cursor: pointer; }
   .user-admin-page .btn:disabled { background-color: #ccc; cursor: not-allowed; transform: none; opacity: 0.7; }
   .user-admin-page .btn:hover:not(:disabled) { transform: translateY(-2px); }
-  .user-admin-page .btn-primary { background-color: #3f51b5; border-color: #3f51b5; width: 100%; font-size: 1.1rem; padding: 0.8rem; }
+  .user-admin-page .btn-primary { background-color: #3f51b5; border-color: #3f51b5;}
+  .user-admin-page #add-user-btn { width: 100%; font-size: 1.1rem; padding: 0.8rem;}
   .user-admin-page .btn-primary:hover:not(:disabled) { background-color: #303f9f; }
-  .user-admin-page .btn-secondary { background-color: #6c757d; border-color: #6c757d; color: #fff; }
+  .user-admin-page .btn-secondary { background-color: #868e96; border-color: #868e96; color: #fff; }
   .user-admin-page .btn-secondary:hover:not(:disabled) { background-color: #5a6268; }
+  .user-admin-page .btn-warning { background-color: #f0ad4e; border-color: #f0ad4e; color: #fff; }
+  .user-admin-page .btn-warning:hover:not(:disabled) { background-color: #ec971f; }
   .user-admin-page .btn-danger { background-color: #d9534f; border-color: #d9534f; color: #fff; }
   .user-admin-page .btn-danger:hover:not(:disabled) { background-color: #c9302c; }
   @media (max-width: 600px) { .user-admin-page .form-row { grid-template-columns: 1fr; } .user-admin-page .users-grid { grid-template-columns: 1fr; } }
@@ -143,6 +181,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
 
   const db = getFirestore(app);
   let adminUser = null; // Module-level variable to hold the admin user state
+  let usersCache = {}; // Cache for user data to populate edit form
 
   document.addEventListener('DOMContentLoaded', () => {
       const authLoadingMessage = document.getElementById('auth-loading-message');
@@ -203,10 +242,19 @@ import AdminLogin from '../../components/AdminLogin.astro';
     const feedbackMessage = document.getElementById('add-user-feedback');
     const usersList = document.getElementById('users-list');
     const noUsersMessage = document.getElementById('no-users-message');
-    const modal = document.getElementById('delete-confirm-modal');
+
+    // Delete Modal Elements
+    const deleteModal = document.getElementById('delete-confirm-modal');
     const modalConfirmBtn = document.getElementById('modal-confirm-btn');
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
     let userIdToDelete = null;
+
+    // Edit Modal Elements
+    const editModal = document.getElementById('edit-user-modal');
+    const editForm = document.getElementById('edit-user-form');
+    const editCancelBtn = document.getElementById('edit-modal-cancel-btn');
+    const editSaveBtn = document.getElementById('edit-modal-save-btn');
+    const editFeedback = document.getElementById('edit-user-feedback');
 
     addUserForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -248,6 +296,12 @@ import AdminLogin from '../../components/AdminLogin.astro';
     onSnapshot(usersQuery, (snapshot) => {
       const adminUid = adminUser ? adminUser.uid : null;
       const userDocs = snapshot.docs.filter(doc => doc.id !== adminUid);
+      
+      usersCache = {}; // Clear and rebuild cache
+      userDocs.forEach(doc => {
+        usersCache[doc.id] = doc.data();
+      });
+
       if (userDocs.length === 0) {
         noUsersMessage.textContent = 'لا يوجد مستخدمون حاليًا.';
         noUsersMessage.style.display = 'block';
@@ -272,6 +326,10 @@ import AdminLogin from '../../components/AdminLogin.astro';
                 <p>الصلاحية: <span class="role-badge ${role}">${roleText}</span></p>
               </div>
               <div class="user-card-footer">
+                <button class="btn btn-warning edit-btn">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.172 2.708-9.5 9.5a.5.5 0 0 0 0 .707l.543.543a.5.5 0 0 0 .707 0l9.5-9.5a.5.5 0 0 0 0-.707l-.543-.543a.5.5 0 0 0-.707 0z"/><path d="M10.5 1.793 2.5 9.793 1 15l5.207-1.5L14.207 5.5zm-3.586 3.586L5 7.207 10.793 1.414 12.586 3.207z"/></svg>
+                  <span>تعديل</span>
+                </button>
                 <button class="btn btn-danger delete-btn">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
                   <span>حذف</span>
@@ -283,16 +341,38 @@ import AdminLogin from '../../components/AdminLogin.astro';
     });
 
     usersList.addEventListener('click', (e) => {
-      const target = e.target.closest('.delete-btn');
-      if (target) {
-        const item = target.closest('.user-card');
+      const deleteBtn = e.target.closest('.delete-btn');
+      if (deleteBtn) {
+        const item = deleteBtn.closest('.user-card');
         userIdToDelete = item.dataset.id;
-        modal.style.display = 'flex';
+        deleteModal.style.display = 'flex';
+      }
+
+      const editBtn = e.target.closest('.edit-btn');
+      if (editBtn) {
+        const item = editBtn.closest('.user-card');
+        const userId = item.dataset.id;
+        const userData = usersCache[userId];
+        if (userData) {
+            document.getElementById('edit-user-id').value = userId;
+            document.getElementById('edit-user-name').value = userData.name;
+            document.getElementById('edit-user-email').value = userData.email;
+            document.getElementById('edit-user-role').value = userData.role;
+            document.getElementById('edit-user-password').value = ''; // Clear password field
+            editFeedback.textContent = '';
+            editModal.style.display = 'flex';
+        }
       }
     });
 
+    // Close Edit Modal
+    editCancelBtn.addEventListener('click', () => {
+      editModal.style.display = 'none';
+    });
+
+    // Close Delete Modal
     modalCancelBtn.addEventListener('click', () => {
-      modal.style.display = 'none';
+      deleteModal.style.display = 'none';
       userIdToDelete = null;
     });
 
@@ -330,11 +410,67 @@ import AdminLogin from '../../components/AdminLogin.astro';
             console.error("API call failed: ", error);
             alert(`حدث خطأ أثناء الاتصال بالخادم: ${error.message}`);
         } finally {
-            modal.style.display = 'none';
+            deleteModal.style.display = 'none';
             modalConfirmBtn.disabled = false;
             modalConfirmBtn.textContent = 'تأكيد الحذف';
             userIdToDelete = null;
         }
     });
+
+    // Handle Edit Form Submission
+    editForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!adminUser) {
+            alert('Authentication error. Please refresh and try again.');
+            return;
+        }
+
+        editSaveBtn.disabled = true;
+        editFeedback.textContent = 'جاري حفظ التعديلات...';
+        editFeedback.className = 'feedback-message';
+
+        const uid = document.getElementById('edit-user-id').value;
+        const name = document.getElementById('edit-user-name').value;
+        const email = document.getElementById('edit-user-email').value;
+        const role = document.getElementById('edit-user-role').value;
+        const password = document.getElementById('edit-user-password').value;
+
+        const payload = { uid, name, email, role };
+        if (password) {
+            payload.password = password;
+        }
+
+        try {
+            const idToken = await adminUser.getIdToken(true);
+            const response = await fetch('/api/update-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                editFeedback.textContent = 'تم تحديث بيانات المستخدم بنجاح!';
+                editFeedback.classList.add('success');
+                setTimeout(() => {
+                    editModal.style.display = 'none';
+                }, 2000);
+            } else {
+                throw new Error(result.error || 'Failed to update user.');
+            }
+        } catch (error) {
+            console.error('Error updating user:', error);
+            editFeedback.textContent = `فشل تحديث المستخدم: ${error.message}`;
+            editFeedback.classList.add('error');
+        } finally {
+            editSaveBtn.disabled = false;
+            setTimeout(() => { editFeedback.textContent = ''; }, 6000);
+        }
+    });
   }
+
 </script>
