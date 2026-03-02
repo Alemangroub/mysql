@@ -22,6 +22,11 @@ service cloud.firestore {
       match /imports/{importId} {
         allow read, write, delete: if isUserRole('admin');
       }
+      
+      // Subcollection for project agreements
+      match /agreements/{agreementId} {
+        allow read, write, delete: if isUserRole('admin');
+      }
     }
 
     // Daily Expenses: Supervisors with the correct role can create, Admins can read/write

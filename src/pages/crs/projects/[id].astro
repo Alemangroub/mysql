@@ -1,3 +1,4 @@
+
 ---
 import Layout from '../../../layouts/Layout.astro';
 import AdminLogin from '../../../components/AdminLogin.astro';
@@ -175,6 +176,22 @@ try {
                                 <p>عرض وإدارة موردي المشروع.</p>
                             </div>
                         </a>
+                        <a href={`/crs/projects/${id}/agreements`} class="report-link-card">
+                            <div class="card-icon agreements-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon-tabler icon-tabler-handshake" width="36" height="36" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                   <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                   <path d="M10 16.5l-3 -3.5l-2 2" />
+                                   <path d="M14 13.5l4 -4.5l2 2" />
+                                   <path d="M10 13l-1.5 1.5" />
+                                   <path d="M14 17l1.5 -1.5" />
+                                   <path d="M3 21l3.333 -10.667a2 2 0 0 1 1.95 -1.333h5.434a2 2 0 0 1 1.95 1.333l3.333 10.667" />
+                                </svg>
+                            </div>
+                            <div class="card-content">
+                                <h3>الاتفاقات</h3>
+                                <p>عرض وإدارة اتفاقات المشروع.</p>
+                            </div>
+                        </a>
                     </section>
                 </>
             ) : (
@@ -261,7 +278,8 @@ try {
         --daily-color: #17a2b8;
         --items-color: #28a745;
         --suppliers-color: #ffc107;
-        --remains-color: #6f42c1; /* New color for remains reports */
+        --remains-color: #6f42c1; 
+        --agreements-color: #fd7e14; /* New color for agreements */
         --notification-color: #ff5252;
     }
     .project-details-page { direction: rtl; font-family: 'Cairo', sans-serif; background-color: #f8f9fa; min-height: 100vh; padding: 2.5rem; }
@@ -287,7 +305,8 @@ try {
     .daily-icon { background-color: var(--daily-color); }
     .items-icon { background-color: var(--items-color); }
     .suppliers-icon { background-color: var(--suppliers-color); }
-    .remains-icon { background-color: var(--remains-color); } /* New style for remains icon */
+    .remains-icon { background-color: var(--remains-color); } 
+    .agreements-icon { background-color: var(--agreements-color); } /* New style for agreements icon */
     .card-content h3 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem 0; }
     .card-content p { margin: 0; color: #6c757d; line-height: 1.7; }
     
