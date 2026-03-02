@@ -33,8 +33,7 @@ import Layout from '../../layouts/Layout.astro';
 
   function initializeDashboard() {
     let currentSupervisor = { uid: null, name: '' };
-    let stagedExpenses = {};
-    let stagedLeftovers = {};
+    let stagedLeftovers = {}; // Staging for leftovers remains the same
 
     const loadingMessage = document.getElementById('auth-loading-message');
     const dashboardContent = document.getElementById('dashboard-content');
@@ -45,12 +44,13 @@ import Layout from '../../layouts/Layout.astro';
 
     if (!dashboardContent || !projectsList) return;
 
-    async function handleFormSubmit(e) {
+    async function handleLegacyFormSubmit(e) {
         e.preventDefault();
         const form = e.target;
         const projectId = form.dataset.projectId;
         const submitButton = form.querySelector('button[type="submit"]');
         const isDailyReportForm = form.matches('.report-form');
+        const isLeftoversForm = form.matches('.leftovers-form');
 
         submitButton.disabled = true;
         submitButton.textContent = 'جارٍ الحفظ...';
@@ -58,54 +58,55 @@ import Layout from '../../layouts/Layout.astro';
         try {
             if (isDailyReportForm) {
                 await saveDailyReport(form, projectId);
-            } else if (form.matches('.expense-form')) {
-                await saveExpenseReport(form, projectId);
-            } else if (form.matches('.leftovers-form')) {
+            } else if (isLeftoversForm) {
                 await saveLeftoversReport(form, projectId);
             }
 
             alert('تم حفظ التقرير بنجاح!');
+            form.reset();
 
             if (isDailyReportForm) {
-                window.location.reload();
+                window.location.reload(); // Still reload for daily text reports
             } else {
-                form.reset();
                 const projectGroup = document.querySelector(`[data-project-group-id="${projectId}"]`);
-                if (projectGroup) {
-                    const formCard = form.closest('.form-card');
-                    if (formCard) formCard.style.display = 'none';
-                }
+                projectGroup?.querySelector('.form-card.leftovers-card')?.setAttribute('style', 'display: none');
             }
 
         } catch (error) {
             console.error("Submission Error:", error);
             let errorMessage = 'حدث خطأ أثناء حفظ التقرير. يرجى المحاولة مرة أخرى.';
             if (error instanceof Error) {
-                if (error.message === 'At least one expense item is required') {
-                    errorMessage = 'يجب إضافة بند مصروف واحد على الأقل قبل الحفظ.';
-                } else if (error.message === 'At least one leftover item is required') {
-                    errorMessage = 'يجب إضافة بند باقٍ واحد على الأقل قبل الحفظ.';
-                } else if (error.message === 'Report text is required') {
-                    errorMessage = 'نص التقرير مطلوب للحفظ.';
-                }
+                 if (error.message === 'At least one leftover item is required') errorMessage = 'يجب إضافة بند باقٍ واحد على الأقل قبل الحفظ.';
+                 else if (error.message === 'Report text is required') errorMessage = 'نص التقرير مطلوب للحفظ.';
             }
             alert(errorMessage);
         } finally {
-            // Only re-enable the button if the page is not going to be reloaded
             if (!isDailyReportForm) {
                 submitButton.disabled = false;
-                 if (form.matches('.expense-form')) {
-                    submitButton.textContent = 'حفظ المصروفات';
-                } else if (form.matches('.leftovers-form')) {
-                    submitButton.textContent = 'حفظ البواقي';
-                }
+                if (isLeftoversForm) submitButton.textContent = 'حفظ البواقي';
             }
         }
     }
 
-    projectsList.addEventListener('submit', handleFormSubmit);
+    projectsList.addEventListener('submit', e => {
+        if (!e.target.matches('.expense-form')) {
+            handleLegacyFormSubmit(e);
+        }
+    });
+    
+    projectsList.addEventListener('change', e => {
+        const target = e.target;
+        if (target.matches('.item-name-select')) {
+            const form = target.closest('form');
+            const otherItemGroup = form.querySelector('.other-item-name-group');
+            otherItemGroup.style.display = target.value === 'اخري' ? 'block' : 'none';
+            if (target.value !== 'اخري') {
+                form.querySelector('.other-item-name').value = ''; 
+            }
+        }
+    });
 
-    projectsList.addEventListener('click', (e) => {
+    projectsList.addEventListener('click', async (e) => {
         const target = e.target;
         const projectGroup = target.closest('.project-group');
         if (!projectGroup) return;
@@ -116,74 +117,115 @@ import Layout from '../../layouts/Layout.astro';
             projectGroup.querySelector('.report-card').style.display = 'none';
             projectGroup.querySelector('.leftovers-card').style.display = 'none';
         }
-
         if (target.matches('.btn-toggle-report')) {
             projectGroup.querySelector('.expense-card').style.display = 'none';
             projectGroup.querySelector('.report-card').style.display = 'block';
             projectGroup.querySelector('.leftovers-card').style.display = 'none';
         }
-
         if (target.matches('.btn-toggle-leftovers')) {
             projectGroup.querySelector('.expense-card').style.display = 'none';
             projectGroup.querySelector('.report-card').style.display = 'none';
             projectGroup.querySelector('.leftovers-card').style.display = 'block';
         }
 
-        if (target.matches('.btn-cancel-expense')) {
-            projectGroup.querySelector('.expense-card').style.display = 'none';
-            stagedExpenses[projectId] = [];
-            renderStagedItems(projectId, projectGroup.querySelector('.expense-form'), 'staged-expenses-list', stagedExpenses);
-        }
-         if (target.matches('.btn-cancel-report')) {
-            projectGroup.querySelector('.report-card').style.display = 'none';
-        }
-
+        if (target.matches('.btn-cancel-expense')) projectGroup.querySelector('.expense-card').style.display = 'none';
+        if (target.matches('.btn-cancel-report')) projectGroup.querySelector('.report-card').style.display = 'none';
         if (target.matches('.btn-cancel-leftovers')) {
             projectGroup.querySelector('.leftovers-card').style.display = 'none';
             stagedLeftovers[projectId] = [];
-             renderStagedItems(projectId, projectGroup.querySelector('.leftovers-form'), 'staged-leftovers-list', stagedLeftovers);
+            renderStagedItems(projectId, projectGroup.querySelector('.leftovers-form'), 'staged-leftovers-list', stagedLeftovers);
         }
 
-        if (target.matches('.btn-add-item')) {
-            const form = target.closest('form');
-            const isLeftovers = form.matches('.leftovers-form');
-            const itemNameInput = form.querySelector('.item-name');
-            const amountInput = form.querySelector('.item-amount');
+        if (target.matches('.btn-save-expense-item')) {
+            const form = target.closest('form.expense-form');
+            if (!form) return;
 
-            const itemName = itemNameInput.value.trim();
-            const amount = amountInput.value.trim();
+            target.disabled = true;
+            target.textContent = 'جارٍ الحفظ...';
+            form.querySelectorAll('.error-message').forEach(el => el.textContent = '');
 
-            if (!itemName) { alert(`يرجى إدخال ${isLeftovers ? 'الصنف' : 'البند'}.`); return; }
-            if (!amount) { alert('يرجى إدخال الكمية.'); return; }
+            try {
+                const select = form.querySelector('.item-name-select');
+                let itemName = select.value;
+                if (itemName === 'اخري') {
+                    const otherInput = form.querySelector('.other-item-name');
+                    itemName = otherInput.value.trim();
+                    if (!itemName) throw { field: '.other-item-name', message: 'يرجى إدخال اسم البند.' };
+                }
+                if (!itemName) throw { field: '.item-name-select', message: 'يرجى اختيار بند.' };
 
-            const stagedItems = isLeftovers ? stagedLeftovers : stagedExpenses;
-            const listClassName = isLeftovers ? 'staged-leftovers-list' : 'staged-expenses-list';
+                const amountInput = form.querySelector('.item-amount');
+                const amount = parseFloat(amountInput.value);
+                if (isNaN(amount) || amount <= 0) throw { field: '.item-amount', message: 'يرجى إدخال مبلغ صحيح.' };
 
-            if (!stagedItems[projectId]) stagedItems[projectId] = [];
-            stagedItems[projectId].push({ id: Date.now(), name: itemName, amount: amount });
-            renderStagedItems(projectId, form, listClassName, stagedItems);
+                const notes = form.querySelector('.expense-notes').value.trim();
+                const imageFiles = form.querySelector('.expense-images').files;
+                
+                const imageUrls = await uploadFiles(imageFiles, projectId, 'daily_expenses');
+                
+                await addDoc(collection(db, 'daily_expenses'), {
+                    projectId: projectId,
+                    supervisorId: currentSupervisor.uid,
+                    supervisorName: currentSupervisor.name,
+                    items: [{ name: itemName, amount: amount }],
+                    totalAmount: amount,
+                    notes: notes,
+                    imageUrls: imageUrls,
+                    isRead: false,
+                    createdAt: serverTimestamp()
+                });
 
-            itemNameInput.value = '';
-            amountInput.value = '';
+                alert('تم ارسال المصروف بنجاح');
+                form.reset();
+                select.dispatchEvent(new Event('change'));
+
+            } catch (error) {
+                console.error("Expense Item Save Error:", error);
+                if (typeof error === 'object' && error.field) {
+                    const field = form.querySelector(error.field);
+                    if (field) {
+                        const errorEl = field.closest('.form-group').querySelector('.error-message');
+                        if (errorEl) errorEl.textContent = error.message;
+                        field.focus();
+                    }
+                } else {
+                    alert(error.message || 'حدث خطأ غير متوقع أثناء حفظ البند.');
+                }
+            } finally {
+                target.disabled = false;
+                target.textContent = 'حفظ البند';
+            }
+        }
+
+        if (target.matches('.btn-add-leftover-item')) {
+            const form = target.closest('form.leftovers-form');
+            const itemName = form.querySelector('.item-name').value.trim();
+            const amount = form.querySelector('.item-amount').value.trim();
+            if (!itemName || !amount) { alert('يرجى ملء الصنف والكمية.'); return; }
+
+            if (!stagedLeftovers[projectId]) stagedLeftovers[projectId] = [];
+            stagedLeftovers[projectId].push({ id: Date.now(), name: itemName, amount: amount });
+            renderStagedItems(projectId, form, 'staged-leftovers-list', stagedLeftovers);
+            form.querySelector('.item-name').value = '';
+            form.querySelector('.item-amount').value = '';
         }
 
         if (target.matches('.btn-delete-item')) {
             const form = target.closest('form');
             const isLeftovers = form.matches('.leftovers-form');
-            const stagedItems = isLeftovers ? stagedLeftovers : stagedExpenses;
-            const listClassName = isLeftovers ? 'staged-leftovers-list' : 'staged-expenses-list';
-            const itemId = parseInt(target.getAttribute('data-id'), 10);
-            if(stagedItems[projectId]) {
-                stagedItems[projectId] = stagedItems[projectId].filter(item => item.id !== itemId);
-                renderStagedItems(projectId, form, listClassName, stagedItems);
+            if (isLeftovers) {
+                const itemId = parseInt(target.getAttribute('data-id'), 10);
+                if(stagedLeftovers[projectId]) {
+                    stagedLeftovers[projectId] = stagedLeftovers[projectId].filter(item => item.id !== itemId);
+                    renderStagedItems(projectId, form, 'staged-leftovers-list', stagedLeftovers);
+                }
             }
         }
     });
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDoc = await getDoc(userDocRef);
+          const userDoc = await getDoc(doc(db, "users", user.uid));
           if (userDoc.exists() && userDoc.data().role === 'supervisor') {
               currentSupervisor.uid = user.uid;
               currentSupervisor.name = userDoc.data().name || 'المشرف';
@@ -196,13 +238,13 @@ import Layout from '../../layouts/Layout.astro';
     });
 
     async function uploadFiles(files, projectId, folder) {
+        if (!files || files.length === 0) return [];
         const uploadPromises = Array.from(files).map(file => {
             const storageRef = ref(storage, `${folder}/${projectId}/${Date.now()}_${file.name}`);
             const uploadTask = uploadBytesResumable(storageRef, file);
             return new Promise((resolve, reject) => {
                 uploadTask.on('state_changed', 
-                    (snapshot) => { /* Progress */ }, 
-                    (error) => reject(error), 
+                    () => {}, (error) => reject(error), 
                     () => getDownloadURL(uploadTask.snapshot.ref).then(resolve)
                 );
             });
@@ -214,7 +256,6 @@ import Layout from '../../layouts/Layout.astro';
         const reportText = form.querySelector('.report-text').value;
         if (!reportText.trim()) throw new Error('Report text is required');
         const imageFiles = form.querySelector('.report-images').files;
-
         const imageUrls = await uploadFiles(imageFiles, projectId, 'daily_reports');
 
         await addDoc(collection(db, 'daily_reports'), {
@@ -228,27 +269,6 @@ import Layout from '../../layouts/Layout.astro';
         });
     }
 
-    async function saveExpenseReport(form, projectId) {
-        const items = stagedExpenses[projectId] || [];
-        if (items.length === 0) throw new Error('At least one expense item is required');
-        const notes = form.querySelector('.expense-notes').value;
-        const imageFiles = form.querySelector('.expense-images').files;
-
-        const imageUrls = await uploadFiles(imageFiles, projectId, 'daily_expenses');
-
-        await addDoc(collection(db, 'daily_expenses'), {
-            projectId: projectId,
-            supervisorId: currentSupervisor.uid,
-            supervisorName: currentSupervisor.name,
-            items: items.map(item => ({ name: item.name, amount: parseFloat(item.amount) })), // Storing clean data
-            notes: notes,
-            imageUrls: imageUrls,
-            isRead: false,
-            createdAt: serverTimestamp()
-        });
-        stagedExpenses[projectId] = []; // Clear staged items after saving
-    }
-
     async function saveLeftoversReport(form, projectId) {
         const items = stagedLeftovers[projectId] || [];
         if (items.length === 0) throw new Error('At least one leftover item is required');
@@ -258,7 +278,7 @@ import Layout from '../../layouts/Layout.astro';
             projectId: projectId,
             supervisorId: currentSupervisor.uid,
             supervisorName: currentSupervisor.name,
-            items: items, // Storing items as they are
+            items: items,
             notes: notes,
             isRead: false,
             createdAt: serverTimestamp()
@@ -278,14 +298,8 @@ import Layout from '../../layouts/Layout.astro';
               return;
           }
 
-          const allSupervisorIds = [...new Set(supervisedProjects.flatMap(p => p.supervisorIds || []))];
-          const supervisorsMap = new Map();
-          if (allSupervisorIds.length > 0) {
-              const supervisorDocs = await Promise.all(allSupervisorIds.map(id => getDoc(doc(db, "users", id))));
-              supervisorDocs.forEach(doc => {
-                  if (doc.exists()) supervisorsMap.set(doc.id, doc.data().name || 'اسم غير معروف');
-              });
-          }
+          const supervisorDocs = await Promise.all(supervisedProjects.flatMap(p => p.supervisorIds || []).map(id => getDoc(doc(db, "users", id))));
+          const supervisorsMap = new Map(supervisorDocs.filter(d => d.exists()).map(d => [d.id, d.data().name || 'اسم غير معروف']));
 
           const enrichedProjects = supervisedProjects.map(project => ({
               ...project,
@@ -302,7 +316,6 @@ import Layout from '../../layouts/Layout.astro';
     }
 
     function createProjectCards(project) {
-        stagedExpenses[project.id] = [];
         stagedLeftovers[project.id] = [];
         const supervisorNamesHtml = project.supervisorNames.join(', ');
         return `
@@ -321,20 +334,49 @@ import Layout from '../../layouts/Layout.astro';
               </div>
               
               <div class="form-card expense-card" style="display: none;">
-                   <form class="expense-form" data-project-id="${project.id}">
-                      <header class="form-card-header"><h2>إضافة مصروفات يومية لمشروع: ${project.projectName}</h2></header>
-                      <div class="form-section-title">إضافة بند مصروف</div>
-                      <div class="add-item-container">
-                          <div class="form-group"><label>اختر البند</label><input type="text" class="item-name" placeholder="اسم البند"></div>
-                          <div class="form-group"><label>المبلغ (ج.م)</label><input type="number" class="item-amount" placeholder="0.00"></div>
-                          <button type="button" class="btn btn-add-item">+ إضافة البند</button>
+                   <form class="expense-form" data-project-id="${project.id}" onsubmit="return false;"> <header class="form-card-header"><h2>إضافة مصروفات يومية لمشروع: ${project.projectName}</h2></header>
+                      <p class="form-description">كل بند يتم إضافته يُحفظ كتقرير منفصل.</p>
+                      
+                      <div class="expense-item-adder">
+                            <div class="form-group item-name-group">
+                                <label>البنود</label>
+                                <select class="item-name-select">
+                                    <option value="" disabled selected>-- اختر بند --</option>
+                                    <option value="عمال">عمال</option>
+                                    <option value="مصروفات نثريه">مصروفات نثريه</option>
+                                    <option value="حديد">حديد</option>
+                                    <option value="اسمنت">اسمنت</option>
+                                    <option value="طوب">طوب</option>
+                                    <option value="رمله">رمله</option>
+                                    <option value="زلط">زلط</option>
+                                    <option value="اخري">اخري</option>
+                                </select>
+                                <small class="error-message"></small>
+                            </div>
+                            <div class="form-group other-item-name-group" style="display: none;">
+                                <label>اسم البند (آخر)</label>
+                                <input type="text" class="other-item-name" placeholder="ادخل اسم البند">
+                                <small class="error-message"></small>
+                            </div>
+                            <div class="form-group">
+                                <label>المبلغ (ج.م)</label>
+                                <input type="number" class="item-amount" placeholder="0.00">
+                                <small class="error-message"></small>
+                            </div>
+                            <div class="form-group notes-group">
+                                <label>ملاحظات (اختياري)</label>
+                                <textarea class="expense-notes" rows="2"></textarea>
+                            </div>
+                            <div class="form-group attachments-group">
+                                <label>إرفاق صور (اختياري)</label>
+                                <input type="file" class="expense-images" multiple accept="image/*">
+                            </div>
                       </div>
-                      <div class="staged-items-container" style="display: none;"><div class="form-section-title">البنود المضافة</div><ul class="staged-expenses-list"></ul></div>
-                      <div class="form-section-title">تفاصيل إضافية</div>
-                      <div class="form-group"><label>ملاحظات (اختياري)</label><textarea class="expense-notes" rows="3"></textarea></div>
-                      <div class="form-group"><label>إرفاق صور (اختياري)</label><input type="file" class="expense-images" multiple accept="image/*"></div>
-                      <div class="upload-progress" style="display: none;"></div>
-                      <div class="form-actions"><button type="submit" class="btn btn-submit">حفظ المصروفات</button><button type="button" class="btn btn-cancel-expense">إلغاء</button></div>
+
+                      <div class="form-actions">
+                        <button type="button" class="btn btn-submit btn-save-expense-item">حفظ البند</button>
+                        <button type="button" class="btn btn-cancel-expense">إغلاق</button>
+                      </div>
                   </form>
               </div>
 
@@ -345,7 +387,7 @@ import Layout from '../../layouts/Layout.astro';
                       <div class="add-item-container">
                           <div class="form-group"><label>الصنف</label><input type="text" class="item-name" placeholder="اسم الصنف"></div>
                           <div class="form-group"><label>الكمية</label><input type="text" class="item-amount" placeholder="مثال: 10 شكاير"></div>
-                          <button type="button" class="btn btn-add-item">+ إضافة البند</button>
+                          <button type="button" class="btn btn-add-leftover-item">+ إضافة البند</button>
                       </div>
                       <div class="staged-items-container" style="display: none;"><div class="form-section-title">البنود المضافة</div><ul class="staged-leftovers-list"></ul></div>
                       <div class="form-section-title">تفاصيل إضافية</div>
@@ -359,7 +401,6 @@ import Layout from '../../layouts/Layout.astro';
                       <header class="form-card-header"><h2>إضافة تقرير يومي لمشروع: ${project.projectName}</h2></header>
                       <div class="form-group"><label>نص التقرير</label><textarea class="report-text" rows="6" required placeholder="اكتب هنا تفاصيل سير العمل، المشاكل، التقدم المحرز..."></textarea></div>
                       <div class="form-group"><label>إرفاق صور (اختياري)</label><input type="file" class="report-images" multiple accept="image/*"></div>
-                      <div class="upload-progress" style="display: none;"></div>
                       <div class="form-actions"><button type="submit" class="btn btn-submit">حفظ التقرير</button><button type="button" class="btn-cancel-report">إلغاء</button></div>
                   </form>
               </div>
@@ -382,9 +423,7 @@ import Layout from '../../layouts/Layout.astro';
       stagedItems[projectId].forEach(item => {
           const li = document.createElement('li');
           li.className = 'staged-item';
-          const unit = listClassName === 'staged-leftovers-list' ? '' : ' ج.م';
-          const amountDisplay = listClassName === 'staged-leftovers-list' ? item.amount : parseFloat(item.amount).toFixed(2);
-          li.innerHTML = `<span>${item.name}</span> <span class="item-amount">${amountDisplay}${unit}</span><button type="button" class="btn-delete-item" data-id="${item.id}">&times;</button>`;
+          li.innerHTML = `<span>${item.name}</span> <span class="item-amount">${item.amount}</span><button type="button" class="btn-delete-item" data-id="${item.id}">&times;</button>`;
           list.appendChild(li);
       });
     }
@@ -422,26 +461,30 @@ import Layout from '../../layouts/Layout.astro';
   .btn-toggle-leftovers { background-color: var(--warning-color); color: white; }
 
   .form-card { margin-top: -1rem; border-top-left-radius: 0; border-top-right-radius: 0; border-top: 1px solid #e2e8f0; }
-  .form-card-header { padding-bottom: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; }
+  .form-card-header { padding-bottom: 1rem; margin-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
   .form-card-header h2 { font-size: 1.4rem; font-weight: 700; color: #1a202c; }
+  .form-description { margin-bottom: 1.5rem; font-size: 0.9rem; color: #555; }
 
-  .expense-form, .report-form, .leftovers-form { display: flex; flex-direction: column; gap: 1.5rem; }
-  .form-group { margin: 0; }
+  .form-group { margin: 0; display: flex; flex-direction: column; }
   label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
   input, select, textarea { width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
 
+  .error-message { color: var(--danger-color); font-size: 0.875rem; margin-top: 0.25rem; min-height: 1.2rem; }
+
+  .expense-item-adder { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; padding-bottom: 1.5rem;}
+  .item-name-group, .other-item-name-group { grid-column: 1 / 2; }
+  .notes-group, .attachments-group { grid-column: 1 / -1; }
+  
   .form-section-title { font-size: 1.2rem; font-weight: 700; margin-top: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb; }
   .add-item-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; align-items: flex-end; }
-  .other-description-group { grid-column: 1 / -1; }
-  .btn-add-item { background-color: var(--secondary-color); color: white; grid-column: 1 / -1; padding: 0.8rem; }
-
+  .btn-add-leftover-item { background-color: var(--secondary-color); color: white; grid-column: 1 / -1; padding: 0.8rem; }
   .staged-items-container { background-color: #f9fafb; border-radius: 8px; padding: 1rem; }
   .staged-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0.5rem; border-bottom: 1px solid #e5e7eb; }
   .item-amount { font-weight: 700; color: #059669; }
   .btn-delete-item { background: #fee2e2; color: var(--danger-color); border-radius: 50%; width: 28px; height: 28px; font-size: 1.2rem; }
 
-  .form-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
-  .btn, .btn-submit, .btn-cancel-expense, .btn-cancel-report, .btn-logout, .btn-add-item, .btn-delete-item { font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
+  .form-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; }
+  .btn, .btn-submit, .btn-cancel-expense, .btn-cancel-report, .btn-cancel-leftovers, .btn-logout, .btn-add-leftover-item, .btn-delete-item, .btn-save-expense-item { font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
   .btn-submit { background-color: var(--primary-color); color: white; padding: 0.8rem 1.5rem; }
   .btn-cancel-expense, .btn-cancel-report, .btn-cancel-leftovers { background-color: var(--gray-color); color: white; padding: 0.8rem 1.5rem; }
 </style>
