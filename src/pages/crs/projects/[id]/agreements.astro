@@ -52,8 +52,30 @@ try {
 
                     <!-- Agreements List -->
                     <div class="agreements-list-container">
-                        <div class="list-header">
-                            <h2>قائمة الاتفاقات</h2>
+                         <div class="list-controls">
+                            <div class="filter-group">
+                                <label for="category-filter">تصفية حسب البند الرئيسي:</label>
+                                <select id="category-filter">
+                                    <option value="" disabled selected>-- اختر بندًا لعرضه --</option>
+                                    <option value="all">عرض الكل</option>
+                                    <option value="المقاول">المقاول</option>
+                                    <option value="المباني">المباني</option>
+                                    <option value="الكهرباء">الكهرباء</option>
+                                    <option value="السباكه">السباكه</option>
+                                    <option value="المحاره">المحاره</option>
+                                    <option value="الرخام">الرخام</option>
+                                    <option value="الدهانات">الدهانات</option>
+                                    <option value="اخري">اخري</option>
+                                </select>
+                            </div>
+                            <div class="filter-group" id="subtype-filter-group" style="display: none;">
+                                <label for="subtype-filter">تصفية حسب البند الفرعي:</label>
+                                <select id="subtype-filter">
+                                    <option value="all">كل بنود المقاول</option>
+                                    <option value="لبشه مسلحه">لبشه مسلحه</option>
+                                    <option value="لبشه عاديه">لبشه عاديه</option>
+                                </select>
+                            </div>
                         </div>
                         <div id="agreements-grid" class="agreements-grid">
                             <!-- Agreement cards will be injected by JavaScript -->
@@ -175,6 +197,7 @@ try {
     let currentEditAgreementId = null;
     const pageContent = document.getElementById('page-content');
     const projectId = pageContent.dataset.projectId;
+    let allAgreementsData = [];
 
     function toYYYYMMDD(date) {
         if (!date) return '';
@@ -232,6 +255,22 @@ try {
         const agreementsGrid = document.getElementById('agreements-grid');
         const deleteModal = document.getElementById('delete-modal');
         let agreementIdToDelete = null;
+
+        const categoryFilter = document.getElementById('category-filter');
+        const subtypeFilter = document.getElementById('subtype-filter');
+        const subtypeFilterGroup = document.getElementById('subtype-filter-group');
+
+        categoryFilter.addEventListener('change', () => {
+            if (categoryFilter.value === 'المقاول') {
+                subtypeFilterGroup.style.display = 'flex';
+            } else {
+                subtypeFilterGroup.style.display = 'none';
+            }
+            subtypeFilter.value = 'all'; // Reset sub-filter when main filter changes
+            displayFilteredAgreements();
+        });
+
+        subtypeFilter.addEventListener('change', displayFilteredAgreements);
 
         const otherTitleGroup = document.getElementById('other-title-group');
         const otherAgreementTitleInput = document.getElementById('other-agreement-title');
@@ -401,20 +440,53 @@ try {
     function listenForAgreements() {
         if (!projectId) return;
         const agreementsQuery = query(collection(db, 'projects', projectId, 'agreements'), orderBy('date', 'desc'));
-        const agreementsGrid = document.getElementById('agreements-grid');
         const noAgreementsMessage = document.getElementById('no-agreements-message');
+        const agreementsGrid = document.getElementById('agreements-grid');
 
         onSnapshot(agreementsQuery, (snapshot) => {
-            if (snapshot.empty) {
-                agreementsGrid.innerHTML = '';
-                noAgreementsMessage.style.display = 'block';
-                agreementsGrid.style.display = 'none';
+            allAgreementsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            if (allAgreementsData.length === 0) {
+                 noAgreementsMessage.textContent = 'لم يتم إضافة أي اتفاقات لهذا المشروع بعد.';
+                 noAgreementsMessage.style.display = 'block';
+                 agreementsGrid.innerHTML = '';
             } else {
-                noAgreementsMessage.style.display = 'none';
-                agreementsGrid.style.display = 'grid';
-                agreementsGrid.innerHTML = snapshot.docs.map(doc => renderAgreementCard({ id: doc.id, ...doc.data() })).join('');
+                displayFilteredAgreements();
             }
         });
+    }
+
+    function displayFilteredAgreements() {
+        const mainFilterValue = document.getElementById('category-filter').value;
+        const subtypeFilterValue = document.getElementById('subtype-filter').value;
+        const agreementsGrid = document.getElementById('agreements-grid');
+        const noAgreementsMessage = document.getElementById('no-agreements-message');
+        
+        if (!mainFilterValue) {
+            agreementsGrid.innerHTML = '';
+            noAgreementsMessage.textContent = 'يرجى اختيار بند من القائمة لعرض الاتفاقات.';
+            noAgreementsMessage.style.display = 'block';
+            return;
+        }
+
+        let filteredData = allAgreementsData;
+
+        if (mainFilterValue !== 'all') {
+            filteredData = filteredData.filter(item => item.mainCategory === mainFilterValue);
+        }
+
+        if (mainFilterValue === 'المقاول' && subtypeFilterValue !== 'all') {
+            filteredData = filteredData.filter(item => item.title === subtypeFilterValue);
+        }
+
+        if (filteredData.length === 0) {
+            agreementsGrid.innerHTML = '';
+            noAgreementsMessage.textContent = 'لا توجد اتفاقات تطابق هذا البند.';
+            noAgreementsMessage.style.display = 'block';
+        } else {
+            agreementsGrid.innerHTML = filteredData.map(renderAgreementCard).join('');
+            noAgreementsMessage.style.display = 'none';
+        }
     }
 
     function renderAgreementCard(data) {
@@ -429,12 +501,12 @@ try {
             if(area) calculationDetails += `<div class="card-item"><strong>المساحة:</strong><span>${area} م²</span></div>`;
             if(pricePerMeter) calculationDetails += `<div class="card-item"><strong>سعر المتر:</strong><span>${pricePerMeter.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</span></div>`;
         } else if (mainCategory) {
-            if(quantity) calculationDetails += `<div class="card-item"><strong>الكمية:</strong><span>${quantity}</span></div>`;
-            if(price) calculationDetails += `<div class="card-item"><strong>السعر:</strong><span>${price.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</span></div>`;
+            if(quantity !== undefined && quantity !== null) calculationDetails += `<div class="card-item"><strong>الكمية:</strong><span>${quantity}</span></div>`;
+            if(price !== undefined && price !== null) calculationDetails += `<div class="card-item"><strong>السعر:</strong><span>${price.toLocaleString('ar-EG', { style: 'currency', currency: 'EGP' })}</span></div>`;
         }
 
         return `
-            <div class="agreement-card" data-id="${id}" data-agreement='${JSON.stringify(storedData)}'>
+            <div class="agreement-card" data-id="${id}" data-agreement='${JSON.stringify(storedData)}' data-main-category="${mainCategory}" data-title="${title}">
                 <div class="card-header">
                     <h3>${title || '-'}</h3>
                     <div class="card-actions">
@@ -533,8 +605,38 @@ try {
 .btn-secondary { background-color: var(--secondary-color); border-color: var(--secondary-color); color: var(--white); }
 .btn-danger { background-color: var(--danger-color); border-color: var(--danger-color); }
 .agreements-list-container { background-color: transparent; padding: 0; border-radius: 0; box-shadow: none; }
-.list-header { margin-bottom: 1.5rem; }
-.list-header h2 { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
+
+.list-controls {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.filter-group label {
+    font-weight: 700;
+    color: var(--light-text);
+    white-space: nowrap;
+}
+.filter-group select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background-color: #fff;
+    min-width: 200px;
+    cursor: pointer;
+}
+
 .agreements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; }
 
 .agreement-card {
@@ -592,5 +694,7 @@ try {
 @media (max-width: 768px) {
     .agreements-grid { grid-template-columns: 1fr; }
     .card-body { grid-template-columns: 1fr; }
+    .list-controls { flex-direction: column; gap: 1rem; }
+    .filter-group { flex-direction: column; align-items: stretch; }
 }
 </style>
