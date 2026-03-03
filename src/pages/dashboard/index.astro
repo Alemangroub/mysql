@@ -1,3 +1,4 @@
+
 ---
 import Layout from '../../layouts/Layout.astro';
 ---
@@ -22,7 +23,6 @@ import Layout from '../../layouts/Layout.astro';
     </div>
 
   </main>
-
 </Layout>
 
 <script>
@@ -33,7 +33,6 @@ import Layout from '../../layouts/Layout.astro';
 
   function initializeDashboard() {
     let currentSupervisor = { uid: null, name: '' };
-    let stagedLeftovers = {}; // Staging for leftovers remains the same
 
     const loadingMessage = document.getElementById('auth-loading-message');
     const dashboardContent = document.getElementById('dashboard-content');
@@ -44,101 +43,31 @@ import Layout from '../../layouts/Layout.astro';
 
     if (!dashboardContent || !projectsList) return;
 
-    async function handleLegacyFormSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
-        const projectId = form.dataset.projectId;
-        const submitButton = form.querySelector('button[type="submit"]');
-        const isDailyReportForm = form.matches('.report-form');
-        const isLeftoversForm = form.matches('.leftovers-form');
-
-        submitButton.disabled = true;
-        submitButton.textContent = 'جارٍ الحفظ...';
-
-        try {
-            if (isDailyReportForm) {
-                await saveDailyReport(form, projectId);
-            } else if (isLeftoversForm) {
-                await saveLeftoversReport(form, projectId);
-            }
-
-            alert('تم حفظ التقرير بنجاح!');
-            form.reset();
-
-            if (isDailyReportForm) {
-                window.location.reload(); // Still reload for daily text reports
-            } else {
-                const projectGroup = document.querySelector(`[data-project-group-id="${projectId}"]`);
-                projectGroup?.querySelector('.form-card.leftovers-card')?.setAttribute('style', 'display: none');
-            }
-
-        } catch (error) {
-            console.error("Submission Error:", error);
-            let errorMessage = 'حدث خطأ أثناء حفظ التقرير. يرجى المحاولة مرة أخرى.';
-            if (error instanceof Error) {
-                 if (error.message === 'At least one leftover item is required') errorMessage = 'يجب إضافة بند باقٍ واحد على الأقل قبل الحفظ.';
-                 else if (error.message === 'Report text is required') errorMessage = 'نص التقرير مطلوب للحفظ.';
-            }
-            alert(errorMessage);
-        } finally {
-            if (!isDailyReportForm) {
-                submitButton.disabled = false;
-                if (isLeftoversForm) submitButton.textContent = 'حفظ البواقي';
-            }
-        }
-    }
-
-    projectsList.addEventListener('submit', e => {
-        if (!e.target.matches('.expense-form')) {
-            handleLegacyFormSubmit(e);
-        }
-    });
-    
-    projectsList.addEventListener('change', e => {
-        const target = e.target;
-        if (target.matches('.item-name-select')) {
-            const form = target.closest('form');
-            const otherItemGroup = form.querySelector('.other-item-name-group');
-            otherItemGroup.style.display = target.value === 'اخري' ? 'block' : 'none';
-            if (target.value !== 'اخري') {
-                form.querySelector('.other-item-name').value = ''; 
-            }
-        }
-    });
-
+    // --- Event Listeners ---
     projectsList.addEventListener('click', async (e) => {
         const target = e.target;
         const projectGroup = target.closest('.project-group');
         if (!projectGroup) return;
-        const projectId = projectGroup.dataset.projectGroupId;
 
+        // Toggle form visibility
         if (target.matches('.btn-toggle-expense')) {
             projectGroup.querySelector('.expense-card').style.display = 'block';
             projectGroup.querySelector('.report-card').style.display = 'none';
-            projectGroup.querySelector('.leftovers-card').style.display = 'none';
         }
         if (target.matches('.btn-toggle-report')) {
             projectGroup.querySelector('.expense-card').style.display = 'none';
             projectGroup.querySelector('.report-card').style.display = 'block';
-            projectGroup.querySelector('.leftovers-card').style.display = 'none';
-        }
-        if (target.matches('.btn-toggle-leftovers')) {
-            projectGroup.querySelector('.expense-card').style.display = 'none';
-            projectGroup.querySelector('.report-card').style.display = 'none';
-            projectGroup.querySelector('.leftovers-card').style.display = 'block';
         }
 
+        // Cancel buttons
         if (target.matches('.btn-cancel-expense')) projectGroup.querySelector('.expense-card').style.display = 'none';
         if (target.matches('.btn-cancel-report')) projectGroup.querySelector('.report-card').style.display = 'none';
-        if (target.matches('.btn-cancel-leftovers')) {
-            projectGroup.querySelector('.leftovers-card').style.display = 'none';
-            stagedLeftovers[projectId] = [];
-            renderStagedItems(projectId, projectGroup.querySelector('.leftovers-form'), 'staged-leftovers-list', stagedLeftovers);
-        }
 
+        // Save expense item
         if (target.matches('.btn-save-expense-item')) {
             const form = target.closest('form.expense-form');
             if (!form) return;
+            const projectId = form.dataset.projectId;
 
             target.disabled = true;
             target.textContent = 'جارٍ الحفظ...';
@@ -196,33 +125,45 @@ import Layout from '../../layouts/Layout.astro';
                 target.textContent = 'حفظ البند';
             }
         }
+    });
 
-        if (target.matches('.btn-add-leftover-item')) {
-            const form = target.closest('form.leftovers-form');
-            const itemName = form.querySelector('.item-name').value.trim();
-            const amount = form.querySelector('.item-amount').value.trim();
-            if (!itemName || !amount) { alert('يرجى ملء الصنف والكمية.'); return; }
+    projectsList.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        // Only daily report form will be submitted this way
+        if (e.target.matches('.report-form')) {
+            const form = e.target;
+            const projectId = form.dataset.projectId;
+            const submitButton = form.querySelector('button[type="submit"]');
 
-            if (!stagedLeftovers[projectId]) stagedLeftovers[projectId] = [];
-            stagedLeftovers[projectId].push({ id: Date.now(), name: itemName, amount: amount });
-            renderStagedItems(projectId, form, 'staged-leftovers-list', stagedLeftovers);
-            form.querySelector('.item-name').value = '';
-            form.querySelector('.item-amount').value = '';
-        }
+            submitButton.disabled = true;
+            submitButton.textContent = 'جارٍ الحفظ...';
 
-        if (target.matches('.btn-delete-item')) {
-            const form = target.closest('form');
-            const isLeftovers = form.matches('.leftovers-form');
-            if (isLeftovers) {
-                const itemId = parseInt(target.getAttribute('data-id'), 10);
-                if(stagedLeftovers[projectId]) {
-                    stagedLeftovers[projectId] = stagedLeftovers[projectId].filter(item => item.id !== itemId);
-                    renderStagedItems(projectId, form, 'staged-leftovers-list', stagedLeftovers);
-                }
+            try {
+                await saveDailyReport(form, projectId);
+                alert('تم حفظ التقرير بنجاح!');
+                window.location.reload(); // Reload to show updated state
+            } catch (error) {
+                console.error("Daily Report Submission Error:", error);
+                alert(error.message || 'حدث خطأ أثناء حفظ التقرير. يرجى المحاولة مرة أخرى.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'حفظ التقرير';
             }
         }
     });
 
+    projectsList.addEventListener('change', e => {
+        const target = e.target;
+        if (target.matches('.item-name-select')) {
+            const form = target.closest('form');
+            const otherItemGroup = form.querySelector('.other-item-name-group');
+            otherItemGroup.style.display = target.value === 'اخري' ? 'block' : 'none';
+            if (target.value !== 'اخري') {
+                form.querySelector('.other-item-name').value = ''; 
+            }
+        }
+    });
+    
+    // --- Auth Logic ---
     onAuthStateChanged(auth, async (user) => {
       if (user) {
           const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -237,6 +178,7 @@ import Layout from '../../layouts/Layout.astro';
       } else { window.location.href = '/crs'; }
     });
 
+    // --- Helper Functions ---
     async function uploadFiles(files, projectId, folder) {
         if (!files || files.length === 0) return [];
         const uploadPromises = Array.from(files).map(file => {
@@ -254,7 +196,7 @@ import Layout from '../../layouts/Layout.astro';
 
     async function saveDailyReport(form, projectId) {
         const reportText = form.querySelector('.report-text').value;
-        if (!reportText.trim()) throw new Error('Report text is required');
+        if (!reportText.trim()) throw new Error('نص التقرير مطلوب للحفظ.');
         const imageFiles = form.querySelector('.report-images').files;
         const imageUrls = await uploadFiles(imageFiles, projectId, 'daily_reports');
 
@@ -267,23 +209,6 @@ import Layout from '../../layouts/Layout.astro';
             isRead: false,
             createdAt: serverTimestamp()
         });
-    }
-
-    async function saveLeftoversReport(form, projectId) {
-        const items = stagedLeftovers[projectId] || [];
-        if (items.length === 0) throw new Error('At least one leftover item is required');
-        const notes = form.querySelector('.leftovers-notes').value;
-
-        await addDoc(collection(db, 'remains_reports'), {
-            projectId: projectId,
-            supervisorId: currentSupervisor.uid,
-            supervisorName: currentSupervisor.name,
-            items: items,
-            notes: notes,
-            isRead: false,
-            createdAt: serverTimestamp()
-        });
-        stagedLeftovers[projectId] = []; // Clear staged items after saving
     }
 
     async function fetchAndDisplayProjects(supervisorUid) {
@@ -316,7 +241,6 @@ import Layout from '../../layouts/Layout.astro';
     }
 
     function createProjectCards(project) {
-        stagedLeftovers[project.id] = [];
         const supervisorNamesHtml = project.supervisorNames.join(', ');
         return `
           <div class="project-group" data-project-group-id="${project.id}">
@@ -329,7 +253,7 @@ import Layout from '../../layouts/Layout.astro';
                   <div class="card-actions">
                       <button class="btn btn-action btn-toggle-expense">مصروفات يومية</button>
                       <button class="btn btn-action btn-toggle-report">تقرير يومي</button>
-                      <button class="btn btn-action btn-toggle-leftovers">تقرير البواقي</button>
+                      <a href="/crs/projects/${project.id}/remains" class="btn btn-action btn-leftovers-link">عرض البواقي</a>
                   </div>
               </div>
               
@@ -380,22 +304,6 @@ import Layout from '../../layouts/Layout.astro';
                   </form>
               </div>
 
-              <div class="form-card leftovers-card" style="display: none;">
-                   <form class="leftovers-form" data-project-id="${project.id}">
-                      <header class="form-card-header"><h2>إضافة تقرير بواقي لمشروع: ${project.projectName}</h2></header>
-                      <div class="form-section-title">إضافة بند باقي</div>
-                      <div class="add-item-container">
-                          <div class="form-group"><label>الصنف</label><input type="text" class="item-name" placeholder="اسم الصنف"></div>
-                          <div class="form-group"><label>الكمية</label><input type="text" class="item-amount" placeholder="مثال: 10 شكاير"></div>
-                          <button type="button" class="btn btn-add-leftover-item">+ إضافة البند</button>
-                      </div>
-                      <div class="staged-items-container" style="display: none;"><div class="form-section-title">البنود المضافة</div><ul class="staged-leftovers-list"></ul></div>
-                      <div class="form-section-title">تفاصيل إضافية</div>
-                      <div class="form-group"><label>ملاحظات (اختياري)</label><textarea class="leftovers-notes" rows="3"></textarea></div>
-                      <div class="form-actions"><button type="submit" class="btn btn-submit">حفظ البواقي</button><button type="button" class="btn btn-cancel-leftovers">إلغاء</button></div>
-                  </form>
-              </div>
-
               <div class="form-card report-card" style="display: none;">
                   <form class="report-form" data-project-id="${project.id}">
                       <header class="form-card-header"><h2>إضافة تقرير يومي لمشروع: ${project.projectName}</h2></header>
@@ -406,26 +314,6 @@ import Layout from '../../layouts/Layout.astro';
               </div>
           </div>
         `;
-    }
-
-    function renderStagedItems(projectId, form, listClassName, stagedItems) {
-      const list = form.querySelector(`.${listClassName}`);
-      const container = form.closest('.form-card').querySelector('.staged-items-container');
-      if (!list || !container) return;
-      
-      list.innerHTML = '';
-      if (!stagedItems[projectId] || stagedItems[projectId].length === 0) {
-          container.style.display = 'none';
-          return;
-      }
-      
-      container.style.display = 'block';
-      stagedItems[projectId].forEach(item => {
-          const li = document.createElement('li');
-          li.className = 'staged-item';
-          li.innerHTML = `<span>${item.name}</span> <span class="item-amount">${item.amount}</span><button type="button" class="btn-delete-item" data-id="${item.id}">&times;</button>`;
-          list.appendChild(li);
-      });
     }
 
     if (logoutButton) logoutButton.addEventListener('click', async () => {
@@ -458,7 +346,7 @@ import Layout from '../../layouts/Layout.astro';
   .btn-action { font-weight: 700; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; transition: all 0.2s; flex-grow: 1; text-align: center; }
   .btn-toggle-expense { background-color: var(--primary-color); color: white; }
   .btn-toggle-report { background-color: var(--secondary-color); color: white; }
-  .btn-toggle-leftovers { background-color: var(--warning-color); color: white; }
+  .btn-leftovers-link { background-color: var(--warning-color); color: white !important; text-decoration: none; }
 
   .form-card { margin-top: -1rem; border-top-left-radius: 0; border-top-right-radius: 0; border-top: 1px solid #e2e8f0; }
   .form-card-header { padding-bottom: 1rem; margin-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
@@ -475,16 +363,8 @@ import Layout from '../../layouts/Layout.astro';
   .item-name-group, .other-item-name-group { grid-column: 1 / 2; }
   .notes-group, .attachments-group { grid-column: 1 / -1; }
   
-  .form-section-title { font-size: 1.2rem; font-weight: 700; margin-top: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e5e7eb; }
-  .add-item-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; align-items: flex-end; }
-  .btn-add-leftover-item { background-color: var(--secondary-color); color: white; grid-column: 1 / -1; padding: 0.8rem; }
-  .staged-items-container { background-color: #f9fafb; border-radius: 8px; padding: 1rem; }
-  .staged-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0.5rem; border-bottom: 1px solid #e5e7eb; }
-  .item-amount { font-weight: 700; color: #059669; }
-  .btn-delete-item { background: #fee2e2; color: var(--danger-color); border-radius: 50%; width: 28px; height: 28px; font-size: 1.2rem; }
-
   .form-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; }
-  .btn, .btn-submit, .btn-cancel-expense, .btn-cancel-report, .btn-cancel-leftovers, .btn-logout, .btn-add-leftover-item, .btn-delete-item, .btn-save-expense-item { font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
+  .btn, .btn-submit, .btn-cancel-expense, .btn-cancel-report, .btn-logout, .btn-save-expense-item { font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
   .btn-submit { background-color: var(--primary-color); color: white; padding: 0.8rem 1.5rem; }
-  .btn-cancel-expense, .btn-cancel-report, .btn-cancel-leftovers { background-color: var(--gray-color); color: white; padding: 0.8rem 1.5rem; }
+  .btn-cancel-expense, .btn-cancel-report { background-color: var(--gray-color); color: white; padding: 0.8rem 1.5rem; }
 </style>
