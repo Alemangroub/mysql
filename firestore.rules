@@ -2,64 +2,75 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Function to check if a user has a specific role
-    function isUserRole(role) {
-      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    // ---
+    // Helper Functions
+    // ---
+
+    function isUserAuthenticated() {
+      return request.auth != null;
     }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isUserRole(role) {
+      return isUserAuthenticated() && getUserRole() == role;
+    }
+
+    function isProjectSupervisor(projectId) {
+      let projectData = get(/databases/$(database)/documents/projects/$(projectId)).data;
+      return isUserAuthenticated() && request.auth.uid in projectData.supervisorIds;
+    }
+
+    // ---
+    // Collection Rules
+    // ---
 
     // Projects Collection
     match /projects/{projectId} {
-      allow read: if isUserRole('admin') || isUserRole('supervisor');
+      allow read: if isUserRole('admin') || isProjectSupervisor(projectId);
       allow write: if isUserRole('admin');
 
-      // Subcollection for project items
-      match /items/{itemId} {
-        allow read: if isUserRole('admin') || isUserRole('supervisor');
-        allow write, delete: if isUserRole('admin');
-      }
-
-      // Subcollection for project imports
-      match /imports/{importId} {
-        allow read, write, delete: if isUserRole('admin');
-      }
-      
-      // Subcollection for project agreements
-      match /agreements/{agreementId} {
-        allow read, write, delete: if isUserRole('admin');
-      }
+      // Subcollections for project details (less restrictive)
+      match /items/{itemId} { allow read, write, delete: if isUserRole('admin'); }
+      match /imports/{importId} { allow read, write, delete: if isUserRole('admin'); }
+      match /agreements/{agreementId} { allow read, write, delete: if isUserRole('admin'); }
     }
 
-    // Daily Expenses: Supervisors with the correct role can create, Admins can read/write
+    // Remains Collection (NEW)
+    match /remains/{remainId} {
+      // Admins can read all entries. Supervisors can only read entries for their own projects.
+      allow read: if isUserRole('admin') || isProjectSupervisor(resource.data.projectId);
+      
+      // Supervisors can create entries for their assigned projects.
+      allow create: if isProjectSupervisor(request.resource.data.projectId) 
+                     && request.auth.uid == request.resource.data.supervisorId; 
+                     
+      // Only admins can update or delete (for now)
+      allow update, delete: if isUserRole('admin');
+    }
+
+    // Daily Expenses: Supervisors with the correct role can create, Admins can manage.
     match /daily_expenses/{expenseId} {
       allow create: if isUserRole('supervisor');
       allow read, update, delete: if isUserRole('admin');
     }
 
-    // Daily Reports: Supervisors with the correct role can create, Admins can read/write
+    // Daily Reports: Supervisors with the correct role can create, Admins can manage.
     match /daily_reports/{reportId} {
       allow create: if isUserRole('supervisor');
       allow read, update, delete: if isUserRole('admin');
     }
 
-    // Remains Reports: Supervisors can create, Admins can manage
-    match /remains_reports/{reportId} {
-      allow create: if isUserRole('supervisor');
-      allow read, update, delete: if isUserRole('admin');
-    }
-
-    // Users: Admins can manage users
+    // Users: Admins can manage users, users can read their own data.
     match /users/{userId} {
        allow read, write: if isUserRole('admin');
-       allow get: if request.auth != null && request.auth.uid == userId;
+       allow get: if isUserAuthenticated() && request.auth.uid == userId;
     }
 
-    // Contracts & Installments: Only Admins have access
-    match /contracts/{contractId} {
-      allow read, write, delete: if isUserRole('admin');
-    }
-
-    match /installments/{installmentId} {
-      allow read, write, delete: if isUserRole('admin');
-    }
+    // Contracts & Installments: Only Admins have access.
+    match /contracts/{contractId} { allow read, write, delete: if isUserRole('admin'); }
+    match /installments/{installmentId} { allow read, write, delete: if isUserRole('admin'); }
   }
 }

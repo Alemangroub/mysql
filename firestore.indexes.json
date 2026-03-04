@@ -13,6 +13,25 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "remains",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "projectId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "material",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
     }
-  ]
+  ],
+  "fieldOverrides": []
 }
