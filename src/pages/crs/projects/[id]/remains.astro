@@ -54,7 +54,7 @@ try {
                         <!-- Iron Card -->
                         <div class="material-card" id="iron-card">
                             <div class="card-header">
-                                <h3>الحديد (بالطن)</h3>
+                                <h3>الحديد (بالسيخ)</h3>
                                 <div class="total-amount-display">
                                     <span>الكمية الحالية:</span>
                                     <span id="iron-total">جاري التحميل...</span>
@@ -67,29 +67,29 @@ try {
                                         <button class="toggle-btn" data-form="dispense-iron-form">صرف كمية</button>
                                     </div>
                                     <form id="add-iron-form" class="material-form">
-                                        <h4>إضافة كمية جديدة</h4>
+                                        <h4>إضافة عدد أسياخ</h4>
                                         <div class="form-row">
                                             <div class="form-group">
-                                                <label for="add-iron-quantity">الكمية (بالطن)</label>
-                                                <input type="number" id="add-iron-quantity" name="quantity" step="0.01" required placeholder="مثال: 1.5">
+                                                <label for="add-iron-quantity">عدد الأسياخ</label>
+                                                <input type="number" id="add-iron-quantity" name="quantity" step="1" required placeholder="مثال: 150">
                                             </div>
                                             <div class="form-group">
-                                                <label for="add-iron-notes">ملاحظات</label>
-                                                <input type="text" id="add-iron-notes" name="notes" placeholder="اختياري">
+                                                <label for="add-iron-notes">نوع الحديد</label>
+                                                <input type="text" id="add-iron-notes" name="notes" required placeholder="مثال: حديد 16مم">
                                             </div>
                                         </div>
                                         <button type="submit" class="btn-submit">إضافة</button>
                                     </form>
                                     <form id="dispense-iron-form" class="material-form" style="display: none;">
-                                        <h4>صرف كمية مستخدمة</h4>
+                                        <h4>صرف عدد أسياخ</h4>
                                         <div class="form-row">
                                             <div class="form-group">
-                                                <label for="dispense-iron-quantity">الكمية (بالطن)</label>
-                                                <input type="number" id="dispense-iron-quantity" name="quantity" step="0.01" required placeholder="مثال: 0.5">
+                                                <label for="dispense-iron-quantity">عدد الأسياخ</label>
+                                                <input type="number" id="dispense-iron-quantity" name="quantity" step="1" required placeholder="مثال: 50">
                                             </div>
                                             <div class="form-group">
                                                 <label for="dispense-iron-notes">سبب الصرف</label>
-                                                <input type="text" id="dispense-iron-notes" name="notes" placeholder="مثال: أعمدة الدور الأول">
+                                                <input type="text" id="dispense-iron-notes" name="notes" required placeholder="مثال: أعمدة الدور الأول">
                                             </div>
                                         </div>
                                         <button type="submit" class="btn-submit btn-dispense">صرف</button>
@@ -100,7 +100,7 @@ try {
                                         <h4>سجل الإضافات</h4>
                                         <div class="table-container">
                                             <table>
-                                                <thead><tr><th>التاريخ</th><th>الكمية (طن)</th><th>المشرف</th><th>ملاحظات</th></tr></thead>
+                                                <thead><tr><th>التاريخ</th><th>الكمية (سيخ)</th><th>المشرف</th><th>النوع</th></tr></thead>
                                                 <tbody id="iron-add-log-body"></tbody>
                                             </table>
                                         </div>
@@ -110,7 +110,7 @@ try {
                                         <h4>سجل الصرف</h4>
                                         <div class="table-container">
                                             <table>
-                                                <thead><tr><th>التاريخ</th><th>الكمية (طن)</th><th>المشرف</th><th>السبب</th></tr></thead>
+                                                <thead><tr><th>التاريخ</th><th>الكمية (سيخ)</th><th>المشرف</th><th>السبب</th></tr></thead>
                                                 <tbody id="iron-dispense-log-body"></tbody>
                                             </table>
                                         </div>
@@ -123,7 +123,7 @@ try {
                         <!-- Cement Card -->
                         <div class="material-card" id="cement-card">
                             <div class="card-header">
-                                <h3>الأسمنت (بالكيس)</h3>
+                                <h3>الأسمنت (بالشكارة)</h3>
                                 <div class="total-amount-display">
                                     <span>الكمية الحالية:</span>
                                     <span id="cement-total">جاري التحميل...</span>
@@ -139,12 +139,12 @@ try {
                                         <h4>إضافة كمية جديدة</h4>
                                         <div class="form-row">
                                             <div class="form-group">
-                                                <label for="add-cement-quantity">الكمية (كيس)</label>
+                                                <label for="add-cement-quantity">الكمية (شكارة)</label>
                                                 <input type="number" id="add-cement-quantity" name="quantity" step="1" required placeholder="مثال: 50">
                                             </div>
                                             <div class="form-group">
-                                                <label for="add-cement-notes">ملاحظات</label>
-                                                <input type="text" id="add-cement-notes" name="notes" placeholder="اختياري">
+                                                <label for="add-cement-notes">نوع الأسمنت</label>
+                                                <input type="text" id="add-cement-notes" name="notes" required placeholder="مثال: أسمنت مقاوم">
                                             </div>
                                         </div>
                                         <button type="submit" class="btn-submit">إضافة</button>
@@ -153,12 +153,12 @@ try {
                                         <h4>صرف كمية مستخدمة</h4>
                                         <div class="form-row">
                                             <div class="form-group">
-                                                <label for="dispense-cement-quantity">الكمية (كيس)</label>
+                                                <label for="dispense-cement-quantity">الكمية (شكارة)</label>
                                                 <input type="number" id="dispense-cement-quantity" name="quantity" step="1" required placeholder="مثال: 10">
                                             </div>
                                             <div class="form-group">
                                                 <label for="dispense-cement-notes">سبب الصرف</label>
-                                                <input type="text" id="dispense-cement-notes" name="notes" placeholder="مثال: صبة السقف">
+                                                <input type="text" id="dispense-cement-notes" name="notes" required placeholder="مثال: صبة السقف">
                                             </div>
                                         </div>
                                         <button type="submit" class="btn-submit btn-dispense">صرف</button>
@@ -169,7 +169,7 @@ try {
                                         <h4>سجل الإضافات</h4>
                                         <div class="table-container">
                                             <table>
-                                                <thead><tr><th>التاريخ</th><th>الكمية (كيس)</th><th>المشرف</th><th>ملاحظات</th></tr></thead>
+                                                <thead><tr><th>التاريخ</th><th>الكمية (شكارة)</th><th>المشرف</th><th>النوع</th></tr></thead>
                                                 <tbody id="cement-add-log-body"></tbody>
                                             </table>
                                         </div>
@@ -179,7 +179,7 @@ try {
                                         <h4>سجل الصرف</h4>
                                         <div class="table-container">
                                             <table>
-                                                <thead><tr><th>التاريخ</th><th>الكمية (كيس)</th><th>المشرف</th><th>السبب</th></tr></thead>
+                                                <thead><tr><th>التاريخ</th><th>الكمية (شكارة)</th><th>المشرف</th><th>السبب</th></tr></thead>
                                                 <tbody id="cement-dispense-log-body"></tbody>
                                             </table>
                                         </div>
@@ -212,8 +212,8 @@ try {
                                                 <input type="number" id="add-other-quantity" name="quantity" step="1" required placeholder="مثال: 10">
                                             </div>
                                             <div class="form-group">
-                                                <label for="add-other-notes">الوصف والملاحظات</label>
-                                                <input type="text" id="add-other-notes" name="notes" placeholder="مثال: براغي حجم 15سم">
+                                                <label for="add-other-notes">وصف البند</label>
+                                                <input type="text" id="add-other-notes" name="notes" required placeholder="مثال: براغي حجم 15سم">
                                             </div>
                                         </div>
                                         <button type="submit" class="btn-submit">إضافة</button>
@@ -226,8 +226,8 @@ try {
                                                 <input type="number" id="dispense-other-quantity" name="quantity" step="1" required placeholder="مثال: 2">
                                             </div>
                                             <div class="form-group">
-                                                <label for="dispense-other-notes">الوصف وسبب الصرف</label>
-                                                <input type="text" id="dispense-other-notes" name="notes" placeholder="مثال: براغي حجم 15سم - تركيب أبواب">
+                                                <label for="dispense-other-notes">سبب الصرف</label>
+                                                <input type="text" id="dispense-other-notes" name="notes" required placeholder="مثال: تركيب أبواب">
                                             </div>
                                         </div>
                                         <button type="submit" class="btn-submit btn-dispense">صرف</button>
@@ -248,7 +248,7 @@ try {
                                         <h4>سجل الصرف</h4>
                                         <div class="table-container">
                                             <table>
-                                                <thead><tr><th>التاريخ</th><th>الكمية</th><th>المشرف</th><th>الوصف</th></tr></thead>
+                                                <thead><tr><th>التاريخ</th><th>الكمية</th><th>المشرف</th><th>السبب</th></tr></thead>
                                                 <tbody id="other-dispense-log-body"></tbody>
                                             </table>
                                         </div>
@@ -276,7 +276,7 @@ try {
     import { db } from '../../../../firebase/client';
     import { collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy } from 'firebase/firestore';
 
-    function setupMaterialSection(material, unit, projectId, user, userRole) {
+    function setupMaterialSection(material, unit, projectId, user, userRole, isInteger = false) {
         const card = document.getElementById(`${material}-card`);
         if (!card) return;
 
@@ -326,7 +326,8 @@ try {
                 }
             });
 
-            totalEl.textContent = `${totalAmount.toFixed(2)} ${unit}`;
+            const displayAmount = isInteger ? totalAmount : totalAmount.toFixed(2);
+            totalEl.textContent = `${displayAmount} ${unit}`;
 
             if (userRole === 'admin') {
                 updateLogTable(addLogBodyEl, addLogEmptyEl, addLogEntries, false);
@@ -338,8 +339,8 @@ try {
         });
 
         if (userRole === 'supervisor') {
-            setupFormSubmission(addForm, false, material, projectId, user);
-            setupFormSubmission(dispenseForm, true, material, projectId, user);
+            setupFormSubmission(addForm, false, material, projectId, user, isInteger);
+            setupFormSubmission(dispenseForm, true, material, projectId, user, isInteger);
         }
     }
 
@@ -351,18 +352,20 @@ try {
             tbody.innerHTML = '';
         } else {
             emptyMsg.style.display = 'none';
-            tbody.innerHTML = entries.map(entry => `
+            tbody.innerHTML = entries.map(entry => {
+                const notesLabel = isDispenseLog ? (entry.material === 'iron' || entry.material === 'cement' ? 'السبب' : 'السبب') : (entry.material === 'iron' || entry.material === 'cement' ? 'النوع' : 'الوصف');
+                return `
                 <tr>
                     <td>${entry.createdAt?.toDate().toLocaleDateString('ar-EG') || ''}</td>
                     <td>${isDispenseLog ? Math.abs(entry.quantity) : entry.quantity}</td>
                     <td>${entry.supervisorName || '-'}</td>
                     <td>${entry.notes || '-'}</td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
     }
 
-    async function handleFormSubmit(e, isDispense, material, projectId, user) {
+    async function handleFormSubmit(e, isDispense, material, projectId, user, isInteger) {
         e.preventDefault();
         const form = e.target;
         const submitBtn = form.querySelector('button[type="submit"]');
@@ -372,7 +375,7 @@ try {
         submitBtn.textContent = 'جارٍ الحفظ...';
 
         try {
-            let quantity = parseFloat(form.quantity.value);
+            let quantity = isInteger ? parseInt(form.quantity.value, 10) : parseFloat(form.quantity.value);
             if (isNaN(quantity) || quantity <= 0) throw new Error('يرجى إدخال كمية موجبة صحيحة.');
             
             if (isDispense) {
@@ -383,7 +386,7 @@ try {
                 projectId: projectId,
                 material: material,
                 quantity: quantity,
-                notes: form.notes.value || '',
+                notes: form.notes.value,
                 supervisorId: user.uid,
                 supervisorName: user.displayName || 'مشرف',
                 createdAt: serverTimestamp()
@@ -401,9 +404,9 @@ try {
         }
     }
 
-    function setupFormSubmission(form, isDispense, material, projectId, user) {
+    function setupFormSubmission(form, isDispense, material, projectId, user, isInteger) {
         if (form) {
-            form.addEventListener('submit', (e) => handleFormSubmit(e, isDispense, material, projectId, user));
+            form.addEventListener('submit', (e) => handleFormSubmit(e, isDispense, material, projectId, user, isInteger));
         }
     }
 
@@ -413,9 +416,9 @@ try {
 
         const projectId = pageContent.dataset.projectId;
         
-        setupMaterialSection('iron', 'طن', projectId, user, userRole);
-        setupMaterialSection('cement', 'كيس', projectId, user, userRole);
-        setupMaterialSection('other', 'وحدة', projectId, user, userRole);
+        setupMaterialSection('iron', 'سيخ', projectId, user, userRole, true);
+        setupMaterialSection('cement', 'شكارة', projectId, user, userRole, true);
+        setupMaterialSection('other', 'وحدة', projectId, user, userRole, true);
     }
 
     initializeAuthCheck(initializeRemainsPage);
