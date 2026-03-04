@@ -29,7 +29,10 @@ service cloud.firestore {
 
     // Projects Collection
     match /projects/{projectId} {
-      allow read: if isUserRole('admin') || isProjectSupervisor(projectId);
+      // Admins can read anything. Supervisors can read projects they are assigned to.
+      // This rule works for both single doc gets and collection-wide queries.
+      allow read: if isUserRole('admin') || (isUserRole('supervisor') && request.auth.uid in resource.data.supervisorIds);
+      
       allow write: if isUserRole('admin');
 
       // Subcollections for project details (less restrictive)
