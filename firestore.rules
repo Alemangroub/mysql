@@ -29,29 +29,21 @@ service cloud.firestore {
 
     // Projects Collection
     match /projects/{projectId} {
-      // Admins can read anything. Supervisors can read projects they are assigned to.
-      // This rule works for both single doc gets and collection-wide queries.
       allow read: if isUserRole('admin') || (isUserRole('supervisor') && request.auth.uid in resource.data.supervisorIds);
-      
       allow write: if isUserRole('admin');
-
-      // Subcollections for project details (less restrictive)
       match /items/{itemId} { allow read, write, delete: if isUserRole('admin'); }
       match /imports/{importId} { allow read, write, delete: if isUserRole('admin'); }
       match /agreements/{agreementId} { allow read, write, delete: if isUserRole('admin'); }
     }
 
-    // Remains Collection (NEW)
+    // Remains Collection (UPDATED)
     match /remains/{remainId} {
-      // Admins can read all entries. Supervisors can only read entries for their own projects.
+      // Admins can read everything. Supervisors can only read entries for their own projects.
       allow read: if isUserRole('admin') || isProjectSupervisor(resource.data.projectId);
-      
-      // Supervisors can create entries for their assigned projects.
-      allow create: if isProjectSupervisor(request.resource.data.projectId) 
-                     && request.auth.uid == request.resource.data.supervisorId; 
-                     
-      // Only admins can update or delete (for now)
-      allow update, delete: if isUserRole('admin');
+
+      // Admins can write anything. Supervisors can write to projects they are assigned to.
+      // This covers create, update, and delete.
+      allow write: if isUserRole('admin') || isProjectSupervisor(request.resource.data.projectId);
     }
 
     // Daily Expenses: Supervisors with the correct role can create, Admins can manage.

@@ -54,103 +54,30 @@ try {
                         <!-- Iron Card -->
                         <div class="material-card" id="iron-card">
                             <div class="card-header">
-                                <h3>الحديد</h3>
+                                <h3>الحديد (بالسيخ)</h3>
                                 <div class="iron-totals-grid">
-                                    <div class="total-group">
-                                        <strong class="total-group-title">3 لينه:</strong>
-                                        <div class="total-amount-display-small">
-                                            <span>كامل (12م):</span>
-                                            <span id="iron-total-3-full">0</span>
-                                        </div>
-                                        <div class="total-amount-display-small">
-                                            <span>قطع:</span>
-                                            <span id="iron-total-3-pieces">0</span>
-                                        </div>
+                                    <div class="total-amount-display">
+                                        <span>3 لينه:</span>
+                                        <span id="iron-total-3">0</span>
                                     </div>
-                                     <div class="total-group">
-                                        <strong class="total-group-title">4 لينه:</strong>
-                                        <div class="total-amount-display-small">
-                                            <span>كامل (12م):</span>
-                                            <span id="iron-total-4-full">0</span>
-                                        </div>
-                                        <div class="total-amount-display-small">
-                                            <span>قطع:</span>
-                                            <span id="iron-total-4-pieces">0</span>
-                                        </div>
+                                    <div class="total-amount-display">
+                                        <span>4 لينه:</span>
+                                        <span id="iron-total-4">0</span>
                                     </div>
-                                     <div class="total-group">
-                                        <strong class="total-group-title">5 لينه:</strong>
-                                        <div class="total-amount-display-small">
-                                            <span>كامل (12م):</span>
-                                            <span id="iron-total-5-full">0</span>
-                                        </div>
-                                        <div class="total-amount-display-small">
-                                            <span>قطع:</span>
-                                            <span id="iron-total-5-pieces">0</span>
-                                        </div>
+                                    <div class="total-amount-display">
+                                        <span>5 لينه:</span>
+                                        <span id="iron-total-5">0</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="supervisor-only" style="display: none;">
                                     <div class="form-toggle-buttons">
-                                        <button class="toggle-btn active" data-form="add-iron-form">إضافة كمية</button>
-                                        <button class="toggle-btn" data-form="dispense-iron-form">صرف كمية</button>
+                                        <button class="toggle-btn active" data-form="add-iron-form">إضافة</button>
+                                        <button class="toggle-btn" data-form="dispense-iron-form">صرف</button>
                                     </div>
-
-                                    <form id="add-iron-form" class="material-form">
-                                        <h4>إضافة رصيد حديد</h4>
-                                        <div class="form-row">
-                                            <div class="form-group">
-                                                <label for="add-iron-type">نوع الحديد</label>
-                                                <select id="add-iron-type" name="ironType" required>
-                                                    <option value="حديد 3 لينه">حديد 3 لينه</option>
-                                                    <option value="حديد 4 لينه">حديد 4 لينه</option>
-                                                    <option value="حديد 5 لينه">حديد 5 لينه</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="add-iron-length">الطول (بالمتر)</label>
-                                                <input type="number" id="add-iron-length" name="length" step="any" required placeholder="12">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="add-iron-quantity">العدد</label>
-                                                <input type="number" id="add-iron-quantity" name="quantity" step="1" required placeholder="50">
-                                            </div>
-                                        </div>
-                                        <div class="form-group" style="width: 100%;">
-                                            <label for="add-iron-notes">السبب</label>
-                                            <input type="text" id="add-iron-notes" name="notes" required placeholder="مثال: توريد للمخزون">
-                                        </div>
-                                        <button type="submit" class="btn-submit">إضافة</button>
-                                    </form>
-
-                                    <form id="dispense-iron-form" class="material-form" style="display: none;">
-                                        <h4>صرف كمية حديد</h4>
-                                        <div class="form-row">
-                                             <div class="form-group">
-                                                <label for="dispense-iron-type">نوع الحديد</label>
-                                                <select id="dispense-iron-type" name="ironType" required>
-                                                    <option value="حديد 3 لينه">حديد 3 لينه</option>
-                                                    <option value="حديد 4 لينه">حديد 4 لينه</option>
-                                                    <option value="حديد 5 لينه">حديد 5 لينه</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="dispense-iron-length">الطول (بالمتر)</label>
-                                                <input type="number" id="dispense-iron-length" name="length" step="any" required placeholder="6.5">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="dispense-iron-quantity">العدد</label>
-                                                <input type="number" id="dispense-iron-quantity" name="quantity" step="1" required placeholder="10">
-                                            </div>
-                                        </div>
-                                        <div class="form-group" style="width: 100%;">
-                                            <label for="dispense-iron-notes">السبب</label>
-                                            <input type="text" id="dispense-iron-notes" name="notes" required placeholder="مثال: أعمدة الدور الأول">
-                                        </div>
-                                        <button type="submit" class="btn-submit btn-dispense">صرف</button>
-                                    </form>
+                                    <form id="add-iron-form" class="material-form"></form>
+                                    <form id="dispense-iron-form" class="material-form" style="display: none;"></form>
                                 </div>
                                 <div class="admin-only" style="display: none;">
                                     <div class="log-section">
@@ -165,19 +92,10 @@ try {
                                                     <button class="filter-btn" data-filter-type="liya" data-filter-value="حديد 5 لينه">5 لينه</button>
                                                 </div>
                                             </div>
-                                            <div class="filter-group">
-                                                <label for="length-filter">الطول:</label>
-                                                <select id="length-filter" class="filter-select">
-                                                    <option value="all">الكل</option>
-                                                    <option value="full">أسياخ كاملة (12م)</option>
-                                                    <option value="pieces">قطع (< 12م)</option>
-                                                    <option disabled>──────────</option>
-                                                </select>
-                                            </div>
                                         </div>
                                         <div class="table-container">
                                             <table>
-                                                <thead><tr><th>التاريخ</th><th>العملية</th><th>النوع</th><th>الطول</th><th>العدد</th><th>المشرف</th><th>السبب</th><th>الإجراءات</th></tr></thead>
+                                                <thead><tr><th>التاريخ</th><th>العملية</th><th>النوع</th><th>العدد</th><th>المشرف</th><th>السبب</th><th>الإجراءات</th></tr></thead>
                                                 <tbody id="iron-log-body"></tbody>
                                             </table>
                                         </div>
@@ -191,43 +109,33 @@ try {
                         <!-- Cement Card -->
                         <div class="material-card" id="cement-card">
                              <div class="card-header">
-                                <h3>الأسمنت (بالشكارة)</h3>
-                                <div class="total-amount-display">
+                                <h3>الأسمنت</h3>
+                                <div class="total-amount-display simple">
                                     <span>الكمية الحالية:</span>
-                                    <span id="cement-total">جاري التحميل...</span>
+                                    <span id="cement-total">0</span>
+                                    <span>شكارة</span>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="supervisor-only" style="display: none;">
                                      <div class="form-toggle-buttons">
-                                        <button class="toggle-btn active" data-form="add-cement-form">إضافة كمية</button>
-                                        <button class="toggle-btn" data-form="dispense-cement-form">صرف كمية</button>
+                                        <button class="toggle-btn active" data-form="add-cement-form">إضافة</button>
+                                        <button class="toggle-btn" data-form="dispense-cement-form">صرف</button>
                                     </div>
                                     <form id="add-cement-form" class="material-form"></form>
                                     <form id="dispense-cement-form" class="material-form" style="display: none;"></form>
                                 </div>
                                 <div class="admin-only" style="display: none;">
                                     <div class="log-section">
-                                        <h4>سجل الإضافات</h4>
+                                        <h4>سجل الأسمنت</h4>
                                         <div class="table-container">
                                             <table>
-                                                <thead><tr><th>التاريخ</th><th>الكمية</th><th>المشرف</th><th>السبب</th><th>الإجراءات</th></tr></thead>
-                                                <tbody id="cement-add-log-body"></tbody>
+                                                <thead><tr><th>التاريخ</th><th>العملية</th><th>الكمية</th><th>المشرف</th><th>السبب</th><th>الإجراءات</th></tr></thead>
+                                                <tbody id="cement-log-body"></tbody>
                                             </table>
                                         </div>
-                                        <p id="cement-add-log-empty" class="log-empty">لا توجد سجلات إضافات.</p>
-                                        <button id="show-all-cement-add" class="btn-show-all" style="display:none;">عرض الكل</button>
-                                    </div>
-                                    <div class="log-section">
-                                        <h4>سجل الصرف</h4>
-                                        <div class="table-container">
-                                            <table>
-                                                <thead><tr><th>التاريخ</th><th>الكمية</th><th>المشرف</th><th>السبب</th><th>الإجراءات</th></tr></thead>
-                                                <tbody id="cement-dispense-log-body"></tbody>
-                                            </table>
-                                        </div>
-                                        <p id="cement-dispense-log-empty" class="log-empty">لا توجد سجلات صرف.</p>
-                                        <button id="show-all-cement-dispense" class="btn-show-all" style="display:none;">عرض الكل</button>
+                                        <p id="cement-log-empty" class="log-empty">لا توجد سجلات.</p>
+                                        <button id="show-all-cement" class="btn-show-all" style="display:none;">عرض الكل</button>
                                     </div>
                                 </div>
                             </div>
@@ -236,47 +144,38 @@ try {
                         <!-- Other Card -->
                         <div class="material-card" id="other-card">
                             <div class="card-header">
-                                <h3>أخرى</h3>
-                                <div class="total-amount-display">
+                                <h3>مواد أخرى</h3>
+                               <div class="total-amount-display simple">
                                     <span>الكمية الحالية:</span>
-                                    <span id="other-total">جاري التحميل...</span>
+                                    <span id="other-total">0</span>
+                                     <span>وحدة</span>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="supervisor-only" style="display: none;">
                                     <div class="form-toggle-buttons">
-                                        <button class="toggle-btn active" data-form="add-other-form">إضافة كمية</button>
-                                        <button class="toggle-btn" data-form="dispense-other-form">صرف كمية</button>
+                                        <button class="toggle-btn active" data-form="add-other-form">إضافة</button>
+                                        <button class="toggle-btn" data-form="dispense-other-form">صرف</button>
                                     </div>
                                     <form id="add-other-form" class="material-form"></form>
                                     <form id="dispense-other-form" class="material-form" style="display: none;"></form>
                                 </div>
                                 <div class="admin-only" style="display: none;">
                                    <div class="log-section">
-                                        <h4>سجل الإضافات</h4>
+                                        <h4>سجل المواد الأخرى</h4>
                                         <div class="table-container">
                                             <table>
-                                                <thead><tr><th>التاريخ</th><th>الكمية</th><th>المشرف</th><th>السبب</th><th>الإجراءات</th></tr></thead>
-                                                <tbody id="other-add-log-body"></tbody>
+                                                <thead><tr><th>التاريخ</th><th>العملية</th><th>الكمية</th><th>المشرف</th><th>السبب</th><th>الإجراءات</th></tr></thead>
+                                                <tbody id="other-log-body"></tbody>
                                             </table>
                                         </div>
-                                        <p id="other-add-log-empty" class="log-empty">لا توجد سجلات إضافات.</p>
-                                        <button id="show-all-other-add" class="btn-show-all" style="display:none;">عرض الكل</button>
-                                    </div>
-                                    <div class="log-section">
-                                        <h4>سجل الصرف</h4>
-                                        <div class="table-container">
-                                            <table>
-                                                <thead><tr><th>التاريخ</th><th>الكمية</th><th>المشرف</th><th>السبب</th><th>الإجراءات</th></tr></thead>
-                                                <tbody id="other-dispense-log-body"></tbody>
-                                            </table>
-                                        </div>
-                                        <p id="other-dispense-log-empty" class="log-empty">لا توجد سجلات صرف.</p>
-                                        <button id="show-all-other-dispense" class="btn-show-all" style="display:none;">عرض الكل</button>
+                                        <p id="other-log-empty" class="log-empty">لا توجد سجلات.</p>
+                                        <button id="show-all-other" class="btn-show-all" style="display:none;">عرض الكل</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     </section>
                 </>
             ) : (
@@ -298,19 +197,13 @@ try {
                     <input type="hidden" name="docId">
                     <input type="hidden" name="material">
                     
-                    <div id="edit-iron-fields" style="display:none;">
-                        <div class="form-group">
-                            <label for="edit-iron-type">نوع الحديد</label>
-                            <select id="edit-iron-type" name="ironType">
-                                <option value="حديد 3 لينه">حديد 3 لينه</option>
-                                <option value="حديد 4 لينه">حديد 4 لينه</option>
-                                <option value="حديد 5 لينه">حديد 5 لينه</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                             <label for="edit-length">الطول (بالمتر)</label>
-                             <input type="number" id="edit-length" name="length" step="any" required>
-                        </div>
+                    <div class="form-group" id="edit-iron-type-group" style="display: none;">
+                        <label for="edit-iron-type">نوع الحديد</label>
+                        <select id="edit-iron-type" name="ironType">
+                            <option value="حديد 3 لينه">حديد 3 لينه</option>
+                            <option value="حديد 4 لينه">حديد 4 لينه</option>
+                            <option value="حديد 5 لينه">حديد 5 لينه</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -338,100 +231,162 @@ try {
     const LOG_LIMIT = 5;
     let supervisorMap = {};
     let userIsAdmin = false;
+    let allLogs = { iron: [], cement: [], other: [] };
+    let currentIronFilter = 'all';
 
-    // --- IRON SECTION --- //
-    let allIronLogs = [];
-    let currentIronFilters = { liya: 'all', length: 'all' };
+    // --- DYNAMIC FORM & TABLE BUILDERS --- //
 
-    function setupIronSection(projectId, user, userRole) {
-        userIsAdmin = userRole === 'admin';
-        const card = document.getElementById('iron-card');
+    function buildMaterialForm(isDispense, material, unit, title) {
+        return `
+            <h4>${title}</h4>
+            <div class="form-group" style="width: 100%;">
+                <label for="${isDispense ? 'dispense' : 'add'}-${material}-quantity">الكمية (${unit})</label>
+                <input type="number" id="${isDispense ? 'dispense' : 'add'}-${material}-quantity" name="quantity" step="1" required placeholder="مثال: 50">
+            </div>
+            <div class="form-group" style="width: 100%;">
+                <label for="${isDispense ? 'dispense' : 'add'}-${material}-notes">السبب</label>
+                <input type="text" id="${isDispense ? 'dispense' : 'add'}-${material}-notes" name="notes" required placeholder="مثال: ${isDispense ? 'أساسات المبنى' : 'توريد للمخزون'}">
+            </div>
+            <button type="submit" class="btn-submit ${isDispense ? 'btn-dispense' : ''}">${isDispense ? 'صرف' : 'إضافة'}</button>
+        `;
+    }
+
+    function buildIronForm(isDispense) {
+        const type = isDispense ? 'dispense' : 'add';
+        return `
+            <h4>${isDispense ? 'صرف' : 'إضافة'} عدد أسياخ</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="${type}-iron-type">نوع الحديد</label>
+                    <select id="${type}-iron-type" name="ironType" required>
+                        <option value="حديد 3 لينه">حديد 3 لينه</option>
+                        <option value="حديد 4 لينه">حديد 4 لينه</option>
+                        <option value="حديد 5 لينه">حديد 5 لينه</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="${type}-iron-quantity">عدد الأسياخ</label>
+                    <input type="number" id="${type}-iron-quantity" name="quantity" step="1" required placeholder="${isDispense ? '50' : '150'}">
+                </div>
+            </div>
+            <div class="form-group" style="width: 100%;">
+                <label for="${type}-iron-notes">السبب</label>
+                <input type="text" id="${type}-iron-notes" name="notes" required placeholder="مثال: ${isDispense ? 'أعمدة الدور الأول' : 'توريد للمخزون'}">
+            </div>
+            <button type="submit" class="btn-submit ${isDispense ? 'btn-dispense' : ''}">${isDispense ? 'صرف' : 'إضافة'}</button>
+        `;
+    }
+
+    // --- GENERIC MATERIAL SECTION SETUP --- //
+    function setupMaterialSection(material, unit, projectId, user, userRole) {
+        const card = document.getElementById(`${material}-card`);
         if (!card) return;
+
+        const addForm = card.querySelector(`#add-${material}-form`);
+        const dispenseForm = card.querySelector(`#dispense-${material}-form`);
+        
+        if (material === 'iron') {
+            addForm.innerHTML = buildIronForm(false);
+            dispenseForm.innerHTML = buildIronForm(true);
+        } else {
+            const title = material === 'cement' ? 'الأسمنت' : 'المواد الأخرى';
+            addForm.innerHTML = buildMaterialForm(false, material, unit, `إضافة ${title}`);
+            dispenseForm.innerHTML = buildMaterialForm(true, material, unit, `صرف ${title}`);
+        }
 
         const toggleButtons = card.querySelectorAll('.toggle-btn');
         toggleButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                const parentCard = e.target.closest('.material-card');
-                parentCard.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+                card.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
                 e.target.classList.add('active');
                 const formId = e.target.dataset.form;
-                parentCard.querySelectorAll('.material-form').forEach(form => {
+                card.querySelectorAll('.material-form').forEach(form => {
                     form.style.display = form.id === formId ? 'flex' : 'none';
                 });
             });
         });
-        
-        const liyaFilterButtons = card.querySelectorAll('[data-filter-type="liya"]');
-        const lengthFilterSelect = card.querySelector('#length-filter');
 
-        const remainsQuery = query(collection(db, 'remains'), where("projectId", "==", projectId), where("material", "==", "iron"), orderBy("createdAt", "desc"));
-
+        const remainsQuery = query(collection(db, 'remains'), where("projectId", "==", projectId), where("material", "==", material), orderBy("createdAt", "desc"));
         onSnapshot(remainsQuery, (snapshot) => {
-            const totals = {
-                '3': { full: 0, pieces: 0 }, '4': { full: 0, pieces: 0 }, '5': { full: 0, pieces: 0 },
-            };
-            const uniqueLengths = new Set();
-            allIronLogs = [];
-            let totalBalance = { '3': 0, '4': 0, '5': 0 };
+            allLogs[material] = [];
+            let total = 0;
+            let ironTotals = { '3': 0, '4': 0, '5': 0 };
 
             snapshot.forEach(doc => {
                 const data = { id: doc.id, ...doc.data() };
-                allIronLogs.push(data);
-                
-                const length = parseFloat(data.length) || 0;
-                if (length > 0 && length < 12) uniqueLengths.add(Math.floor(length));
-
-                const type = data.ironType === 'حديد 3 لينه' ? '3' : data.ironType === 'حديد 4 لينه' ? '4' : '5';
-                totalBalance[type] += data.quantity;
+                allLogs[material].push(data);
+                if (material === 'iron') {
+                    const type = data.ironType === 'حديد 3 لينه' ? '3' : data.ironType === 'حديد 4 لينه' ? '4' : '5';
+                    if (ironTotals[type] !== undefined) ironTotals[type] += data.quantity;
+                } else {
+                    total += data.quantity;
+                }
             });
 
-            // This logic needs to be re-evaluated. For now, just display total balance.
-            // A more complex calculation is needed for full vs pieces based on total length.
-            for (let i = 3; i <= 5; i++) {
-                document.getElementById(`iron-total-${i}-full`).textContent = totalBalance[i.toString()];
-                document.getElementById(`iron-total-${i}-pieces`).textContent = '--';
+            if (material === 'iron') {
+                document.getElementById('iron-total-3').textContent = ironTotals['3'];
+                document.getElementById('iron-total-4').textContent = ironTotals['4'];
+                document.getElementById('iron-total-5').textContent = ironTotals['5'];
+                if (userRole === 'admin') renderIronLogTable();
+            } else {
+                document.getElementById(`${material}-total`).textContent = total;
+                if (userRole === 'admin') renderSimpleLogTable(material);
             }
-            
-            updateLengthFilterOptions(Array.from(uniqueLengths).sort((a,b) => a-b));
-
-            if (userRole === 'admin') renderIronLogTable();
         });
 
         if (userRole === 'admin') {
             card.addEventListener('click', handleAdminActions);
-            liyaFilterButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    liyaFilterButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentIronFilters.liya = btn.dataset.filterValue;
-                    renderIronLogTable(); 
+            document.getElementById(`show-all-${material}`).addEventListener('click', () => {
+                if(material === 'iron') renderIronLogTable(true); else renderSimpleLogTable(material, true);
+            });
+             if (material === 'iron') {
+                const liyaFilterButtons = card.querySelectorAll('[data-filter-type="liya"]');
+                liyaFilterButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        liyaFilterButtons.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentIronFilter = btn.dataset.filterValue;
+                        renderIronLogTable(); 
+                    });
                 });
-            });
-            lengthFilterSelect.addEventListener('change', (e) => {
-                currentIronFilters.length = e.target.value;
-                renderIronLogTable();
-            });
-            document.getElementById('show-all-iron').addEventListener('click', () => renderIronLogTable(true));
+            }
         }
-       
+
         if (userRole === 'admin' || userRole === 'supervisor') {
-            const addForm = card.querySelector('#add-iron-form');
-            const dispenseForm = card.querySelector('#dispense-iron-form');
-            setupIronFormSubmission(addForm, false, projectId, user);
-            setupIronFormSubmission(dispenseForm, true, projectId, user);
+            setupFormSubmission(addForm, false, projectId, user, material);
+            setupFormSubmission(dispenseForm, true, projectId, user, material);
         }
     }
 
-    function updateLengthFilterOptions(lengths) {
-        const select = document.getElementById('length-filter');
-        select.querySelectorAll('option[data-dynamic]').forEach(opt => opt.remove());
-        lengths.forEach(len => {
-            const option = document.createElement('option');
-            option.value = len;
-            option.textContent = `${len} متر`;
-            option.dataset.dynamic = true;
-            select.appendChild(option);
-        });
+    // --- LOG RENDERING --- //
+    function renderSimpleLogTable(material, showAll = false) {
+        const tbody = document.getElementById(`${material}-log-body`);
+        const emptyMsg = document.getElementById(`${material}-log-empty`);
+        const showAllBtn = document.getElementById(`show-all-${material}`);
+        const entries = allLogs[material] || [];
+
+        emptyMsg.style.display = entries.length === 0 ? 'block' : 'none';
+        showAllBtn.style.display = (entries.length > LOG_LIMIT && !showAll) ? 'block' : 'none';
+
+        const entriesToRender = showAll ? entries : entries.slice(0, LOG_LIMIT);
+        tbody.innerHTML = entriesToRender.map(entry => {
+            const supervisorName = entry.supervisorName || supervisorMap[entry.supervisorId] || 'مشرف غير معروف';
+            const actionsHtml = userIsAdmin ? `
+                <td class="log-actions">
+                    <button class="btn-action btn-edit" data-id="${entry.id}" data-material="${material}">تعديل</button>
+                    <button class="btn-action btn-delete" data-id="${entry.id}" data-material="${material}">حذف</button>
+                </td>` : '';
+            return `
+                <tr>
+                    <td>${entry.createdAt?.toDate().toLocaleDateString('ar-EG') || ''}</td>
+                    <td class="${entry.quantity > 0 ? 'text-success' : 'text-danger'}">${entry.quantity > 0 ? 'إضافة' : 'صرف'}</td>
+                    <td>${Math.abs(entry.quantity)}</td>
+                    <td>${supervisorName}</td>
+                    <td>${entry.notes || '-'}</td>
+                    ${actionsHtml}
+                </tr>
+            `;
+        }).join('');
     }
 
     function renderIronLogTable(showAll = false) {
@@ -439,19 +394,9 @@ try {
         const emptyMsg = document.getElementById('iron-log-empty');
         const showAllBtn = document.getElementById('show-all-iron');
 
-        let filteredEntries = allIronLogs;
-        if (currentIronFilters.liya !== 'all') {
-            filteredEntries = filteredEntries.filter(e => e.ironType === currentIronFilters.liya);
-        }
-        if (currentIronFilters.length !== 'all') {
-            const filterLength = currentIronFilters.length;
-            if (filterLength === 'full') {
-                filteredEntries = filteredEntries.filter(e => parseFloat(e.length) === 12);
-            } else if (filterLength === 'pieces') {
-                filteredEntries = filteredEntries.filter(e => parseFloat(e.length) < 12);
-            } else {
-                filteredEntries = filteredEntries.filter(e => Math.floor(parseFloat(e.length)) === parseInt(filterLength));
-            }
+        let filteredEntries = allLogs.iron;
+        if (currentIronFilter !== 'all') {
+            filteredEntries = filteredEntries.filter(e => e.ironType === currentIronFilter);
         }
 
         emptyMsg.style.display = filteredEntries.length === 0 ? 'block' : 'none';
@@ -464,14 +409,13 @@ try {
                 <td class="log-actions">
                     <button class="btn-action btn-edit" data-id="${entry.id}" data-material="iron">تعديل</button>
                     <button class="btn-action btn-delete" data-id="${entry.id}" data-material="iron">حذف</button>
-                </td>` : ''
+                </td>` : '';
 
             return `
                 <tr>
                     <td>${entry.createdAt?.toDate().toLocaleDateString('ar-EG') || ''}</td>
                     <td class="${entry.quantity > 0 ? 'text-success' : 'text-danger'}">${entry.quantity > 0 ? 'إضافة' : 'صرف'}</td>
                     <td>${(entry.ironType || '').replace('حديد','').trim()}</td>
-                    <td>${entry.length != null ? `${entry.length} م` : '-'}</td>
                     <td>${Math.abs(entry.quantity)}</td>
                     <td>${supervisorName}</td>
                     <td>${entry.notes || '-'}</td>
@@ -480,7 +424,8 @@ try {
             `}).join('');
     }
 
-    async function handleIronFormSubmit(e, isDispense, projectId, user) {
+    // --- FORM SUBMISSION --- //
+    async function handleFormSubmit(e, isDispense, projectId, user, material) {
         e.preventDefault();
         const form = e.target;
         const submitBtn = form.querySelector('button[type="submit"]');
@@ -488,26 +433,28 @@ try {
 
         try {
             const quantity = parseInt(form.quantity.value, 10);
-            const length = parseFloat(form.length.value);
-            if (isNaN(quantity) || quantity <= 0) throw new Error('يرجى إدخال عدد صحيح موجب.');
-            if (isNaN(length) || length <= 0) throw new Error('يرجى إدخال طول صحيح موجب.');
+            if (isNaN(quantity) || quantity <= 0) throw new Error('يرجى إدخال كمية صحيحة موجبة.');
             
-            const ironType = form.ironType.value;
-            if (!ironType) throw new Error('يرجى اختيار نوع الحديد.');
-
-            await addDoc(collection(db, 'remains'), {
-                projectId, material: 'iron', ironType, length,
+            let data = {
+                projectId, material,
                 quantity: isDispense ? -quantity : quantity,
                 notes: form.notes.value,
                 supervisorId: user.uid,
                 supervisorName: user.displayName || user.email || 'مستخدم',
                 createdAt: serverTimestamp()
-            });
+            };
 
+            if (material === 'iron') {
+                const ironType = form.ironType.value;
+                if (!ironType) throw new Error('يرجى اختيار نوع الحديد.');
+                data.ironType = ironType;
+            }
+
+            await addDoc(collection(db, 'remains'), data);
             form.reset();
             alert('تمت العملية بنجاح!');
         } catch (error) {
-            console.error(`Error submitting iron form:`, error);
+            console.error(`Error submitting ${material} form:`, error);
             alert(error.message || 'حدث خطأ أثناء الحفظ.');
         } finally {
             submitBtn.disabled = false;
@@ -515,26 +462,21 @@ try {
         }
     }
 
-    function setupIronFormSubmission(form, isDispense, projectId, user) {
+    function setupFormSubmission(form, isDispense, projectId, user, material) {
         if (form) {
-            form.addEventListener('submit', (e) => handleIronFormSubmit(e, isDispense, projectId, user));
+            form.addEventListener('submit', (e) => handleFormSubmit(e, isDispense, projectId, user, material));
         }
-    }
-
-    // --- GENERIC MATERIAL SECTION (Placeholder) --- //
-    function setupMaterialSection(material, unit, projectId, user, userRole, isInteger = false) { 
-        // This section will be re-enabled later.
     }
 
     // --- ADMIN ACTIONS (EDIT/DELETE) --- //
     function handleAdminActions(e) {
-        if (e.target.matches('.btn-delete[data-material="iron"]')) {
-            const docId = e.target.dataset.id;
+        const target = e.target.closest('button.btn-action');
+        if (!target) return;
+        const docId = target.dataset.id;
+        const material = target.dataset.material;
+        if (target.classList.contains('btn-delete')) {
             handleDelete(docId);
-        }
-        if (e.target.matches('.btn-edit[data-material="iron"]')) {
-            const docId = e.target.dataset.id;
-            const material = e.target.dataset.material;
+        } else if (target.classList.contains('btn-edit')) {
             openEditModal(docId, material);
         }
     }
@@ -554,24 +496,24 @@ try {
     function openEditModal(docId, material) {
         const modal = document.getElementById('edit-modal');
         const form = document.getElementById('edit-form');
-        const ironFields = document.getElementById('edit-iron-fields');
+        const ironTypeGroup = document.getElementById('edit-iron-type-group');
         const quantityLabel = document.getElementById('edit-quantity-label');
-
+        
         form.reset();
         form.docId.value = docId;
         form.material.value = material;
 
+        const entry = allLogs[material]?.find(log => log.id === docId);
+        if (!entry) { return alert('خطأ: لم يتم العثور على السجل.'); }
+
+        ironTypeGroup.style.display = material === 'iron' ? 'block' : 'none';
+        quantityLabel.textContent = material === 'iron' ? 'العدد' : 'الكمية';
+        form.quantity.value = Math.abs(entry.quantity);
+        form.notes.value = entry.notes || '';
         if (material === 'iron') {
-            const entry = allIronLogs.find(log => log.id === docId);
-            if (!entry) { return alert('خطأ: لم يتم العثور على السجل.'); }
-            
-            ironFields.style.display = 'block';
-            quantityLabel.textContent = 'العدد';
-            form.quantity.value = Math.abs(entry.quantity);
-            form.notes.value = entry.notes || '';
-            form.length.value = entry.length || '';
             form.ironType.value = entry.ironType;
-        }
+        } 
+
         modal.style.display = 'flex';
     }
 
@@ -584,26 +526,24 @@ try {
         submitBtn.disabled = true; submitBtn.textContent = 'جارٍ الحفظ...';
         
         try {
-            let originalEntry, updatedData;
             const newQuantity = parseInt(form.quantity.value, 10);
             if(isNaN(newQuantity) || newQuantity < 0) throw new Error("الكمية يجب أن تكون رقمًا موجبًا.");
+            
+            const originalEntry = allLogs[material]?.find(log => log.id === docId);
+            if (!originalEntry) throw new Error("لم يتم العثور على السجل الأصلي.");
+
+            let updatedData = {
+                notes: form.notes.value,
+                quantity: originalEntry.quantity > 0 ? newQuantity : -newQuantity,
+            };
 
             if (material === 'iron') {
-                originalEntry = allIronLogs.find(log => log.id === docId);
-                if (!originalEntry) throw new Error("لم يتم العثور على السجل الأصلي.");
-                const newLength = parseFloat(form.length.value);
-                if(isNaN(newLength) || newLength <= 0) throw new Error("الطول يجب أن يكون رقمًا موجبًا.");
-
-                updatedData = {
-                    notes: form.notes.value,
-                    quantity: originalEntry.quantity > 0 ? newQuantity : -newQuantity,
-                    length: newLength,
-                    ironType: form.ironType.value
-                };
-                await updateDoc(doc(db, 'remains', docId), updatedData);
-                alert('تم التعديل بنجاح!');
-                document.getElementById('edit-modal').style.display = 'none';
-            } 
+                updatedData.ironType = form.ironType.value;
+            }
+            
+            await updateDoc(doc(db, 'remains', docId), updatedData);
+            alert('تم التعديل بنجاح!');
+            document.getElementById('edit-modal').style.display = 'none';
         } catch(error) {
             alert(error.message || 'فشل تحديث السجل.');
         } finally {
@@ -634,15 +574,15 @@ try {
     async function initializeRemainsPage(user, userRole) {
         const pageContent = document.getElementById('page-content');
         if (!pageContent || pageContent.dataset.projectExists !== 'true') return;
+        userIsAdmin = userRole === 'admin';
 
         const projectId = pageContent.dataset.projectId;
         const supervisorIds = JSON.parse(pageContent.dataset.supervisorIds || '[]');
         supervisorMap = await getSupervisorNames(supervisorIds);
         
-        setupIronSection(projectId, user, userRole);
-        // Other sections are disabled for now to focus on iron.
-        // setupMaterialSection('cement', 'شكارة', projectId, user, userRole, true);
-        // setupMaterialSection('other', 'وحدة', projectId, user, userRole, true);
+        setupMaterialSection('iron', 'سيخ', projectId, user, userRole);
+        setupMaterialSection('cement', 'شكارة', projectId, user, userRole);
+        setupMaterialSection('other', 'وحدة', projectId, user, userRole);
     }
     initializeAuthCheck(initializeRemainsPage);
 
@@ -674,17 +614,20 @@ h1 { font-size: 2.25rem; font-weight: 800; color: var(--text-dark); }
 
 .materials-section { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
 
-@media (min-width: 1024px) {
-    .materials-section { grid-template-columns: 1fr; }
-    #iron-card { grid-column: 1 / -1; } 
-}
-
 .material-card { background-color: var(--bg-white); border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; }
-.card-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; background-color: #fcfdff; }
+.card-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; background-color: #fcfdff; }
 .card-header h3 { font-size: 1.75rem; font-weight: 700; color: var(--text-dark); margin: 0; }
 
-.total-amount-display span:first-child { color: var(--text-light); font-size: 1rem; }
-.total-amount-display span:last-child { display: block; font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+.iron-totals-grid { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.total-amount-display { text-align: right; background-color: #f8f9fa; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);}
+.total-amount-display span:first-child { color: var(--text-light); font-size: 0.9rem; margin-left: 0.5rem; }
+.total-amount-display span:last-child { font-size: 1.25rem; font-weight: 700; color: var(--primary-color); }
+
+.total-amount-display.simple { padding: 0.75rem 1.25rem; }
+.total-amount-display.simple span:first-child { font-size: 1rem; }
+.total-amount-display.simple span:last-child { font-size: 1.1rem; color: var(--text-light); margin-right: 0.5rem; }
+.total-amount-display.simple span:nth-child(2) { font-size: 1.75rem; color: var(--primary-color); }
+
 
 .card-body { padding: 1.5rem; flex-grow: 1; }
 
@@ -693,9 +636,9 @@ h1 { font-size: 2.25rem; font-weight: 800; color: var(--text-dark); }
 .toggle-btn.active { background-color: var(--primary-color); color: white; }
 .toggle-btn:not(.active):hover { background-color: #f1f5f9; }
 
-.material-form { border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; background-color: #fcfdff; display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; }
+.material-form { border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; background-color: #fcfdff; display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
 .material-form h4 { font-size: 1.2rem; margin: 0 0 1rem 0; font-weight: 600; width: 100%;}
-.form-row { display: flex; gap: 1.5rem; flex-grow: 1; }
+.form-row { display: flex; gap: 1rem; flex-grow: 1; width: 100%;}
 .form-group { flex: 1; min-width: 150px; }
 .form-group label { display: block; margin-bottom: .5rem; font-weight: 600; }
 .form-group input, .form-group select { width: 100%; padding: .75rem; border: 1px solid #cbd5e1; border-radius: 8px; background-color: white; }
@@ -715,7 +658,7 @@ th, td { padding: 1rem; border-bottom: 1px solid var(--border-color); }
 th { font-weight: 700; color: var(--text-dark); }
 tbody tr:last-child td { border-bottom: none; }
 tbody td { color: var(--text-light); }
-.log-empty { display: none; text-align: center; padding: 1.5rem; color: var(--text-light); background-color: #f8f9fa; border-radius: 8px; }
+.log-empty { text-align: center; padding: 1.5rem; color: var(--text-light); background-color: #f8f9fa; border-radius: 8px; }
 
 .text-success { color: var(--success-color) !important; font-weight: 600; }
 .text-danger { color: var(--danger-color) !important; font-weight: 600; }
@@ -737,21 +680,13 @@ tbody td { color: var(--text-light); }
 #edit-form .form-group { margin-bottom: 1.5rem; }
 #edit-form .btn-submit { width: 100%; padding: 1rem; }
 
-.iron-totals-grid { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
-.total-group { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; background-color: #f8f9fa; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); }
-.total-group-title { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
-
-.total-amount-display-small { text-align: right; background: none; padding: 0; border: none; }
-.total-amount-display-small span:first-child { font-size: 0.9rem; }
-.total-amount-display-small span:last-child { font-size: 1.2rem; }
-
 .iron-filter-controls { display: flex; align-items: center; gap: 2rem; margin-bottom: 1.5rem; flex-wrap: wrap; background-color: #f8f9fa; padding: 1rem; border-radius: 8px; }
 .filter-group { display: flex; align-items: center; gap: 0.75rem; }
-.filter-group label, .filter-group span { font-weight: 600; color: var(--text-dark); }
+.filter-group span { font-weight: 600; color: var(--text-dark); }
 .filter-buttons { display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
 .filter-btn { background-color: white; border: none; border-left: 1px solid var(--border-color); padding: .5rem 1rem; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-light); transition: all 0.2s; }
 .filter-buttons .filter-btn:last-child { border-left: none; }
 .filter-btn.active { background-color: var(--primary-color); color: white; }
 .filter-btn:not(.active):hover { background-color: #eef5ff; }
-.filter-select { padding: .5rem; border-radius: 8px; border: 1px solid var(--border-color); font-weight: 600; }
+
 </style>
