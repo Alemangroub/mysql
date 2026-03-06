@@ -359,7 +359,7 @@ try {
                             <dd data-key="ironType"></dd>
                         </div>
                         <div class="log-detail-item">
-                            <dt>العدد</dt>
+                            <dt>عدد الأسياخ</dt>
                             <dd data-key="quantity"></dd>
                         </div>
                         <div class="log-detail-item">
@@ -387,7 +387,7 @@ try {
     import { db } from '../../../../firebase/client';
     import { collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy, doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 
-    const LOG_LIMIT = 5;
+    const LOG_LIMIT = 3;
     let supervisorMap = {};
     let userIsAdmin = false;
     let allLogs = { iron: [], cement: [], other: [] };
@@ -489,7 +489,7 @@ try {
 
             cardClone.querySelector('.log-card').classList.add(isAddition ? 'log-card-add' : 'log-card-dispense');
             cardClone.querySelector('.log-action-type').textContent = isAddition ? 'إضافة' : 'صرف';
-            cardClone.querySelector('.log-date').textContent = entry.createdAt?.toDate().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' }) || '';
+            cardClone.querySelector('.log-date').textContent = entry.createdAt?.toDate().toLocaleString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) || '';
             
             cardClone.querySelector('[data-key="quantity"]').textContent = Math.abs(entry.quantity);
             cardClone.querySelector('[data-key="supervisor"]').textContent = supervisorName;
@@ -539,7 +539,7 @@ try {
 
             cardClone.querySelector('.log-card').classList.add(isAddition ? 'log-card-add' : 'log-card-dispense');
             cardClone.querySelector('.log-action-type').textContent = isAddition ? 'إضافة' : 'صرف';
-            cardClone.querySelector('.log-date').textContent = entry.createdAt?.toDate().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' }) || '';
+            cardClone.querySelector('.log-date').textContent = entry.createdAt?.toDate().toLocaleString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) || '';
             
             cardClone.querySelector('[data-key="ironType"]').textContent = (entry.ironType || '').replace('حديد', '').trim();
             cardClone.querySelector('[data-key="quantity"]').textContent = Math.abs(entry.quantity);
@@ -574,12 +574,25 @@ try {
             const quantity = parseInt(form.quantity.value, 10);
             if (isNaN(quantity) || quantity <= 0) throw new Error('يرجى إدخال كمية صحيحة موجبة.');
             
+            // Fetch the user's display name from Firestore
+            let supervisorName = user.email || 'مستخدم غير معروف'; // Fallback to email
+            try {
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+                if (userDocSnap.exists()) {
+                    supervisorName = userDocSnap.data().displayName || supervisorName;
+                }
+            } catch (userDocError) {
+                console.error("Error fetching user document:", userDocError);
+                // Continue with the fallback name
+            }
+
             let data = {
                 projectId, material,
                 quantity: isDispense ? -quantity : quantity,
                 notes: form.notes.value,
                 supervisorId: user.uid,
-                supervisorName: user.displayName || user.email || 'مستخدم',
+                supervisorName: supervisorName, // Use the fetched name
                 createdAt: serverTimestamp()
             };
 
@@ -647,7 +660,7 @@ try {
         if (!entry) { return alert('خطأ: لم يتم العثور على السجل.'); }
 
         ironTypeGroup.style.display = material === 'iron' ? 'block' : 'none';
-        quantityLabel.textContent = material === 'iron' ? 'العدد' : 'الكمية';
+        quantityLabel.textContent = material === 'iron' ? 'عدد الأسياخ' : 'الكمية';
         form.quantity.value = Math.abs(entry.quantity);
         form.notes.value = entry.notes || '';
         if (material === 'iron') {
