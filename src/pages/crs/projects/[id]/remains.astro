@@ -55,18 +55,30 @@ try {
                         <div class="material-card" id="iron-card">
                             <div class="card-header">
                                 <h3>الحديد (بالسيخ)</h3>
-                                <div class="iron-totals-grid">
-                                    <div class="total-amount-display">
-                                        <span>3 لينه:</span>
-                                        <span id="iron-total-3">0</span>
+                                <div class="material-header-content">
+                                    <div class="iron-totals-grid">
+                                        <div class="total-amount-display">
+                                            <span>3 لينه:</span>
+                                            <span id="iron-total-3">0</span>
+                                        </div>
+                                        <div class="total-amount-display">
+                                            <span>4 لينه:</span>
+                                            <span id="iron-total-4">0</span>
+                                        </div>
+                                        <div class="total-amount-display">
+                                            <span>5 لينه:</span>
+                                            <span id="iron-total-5">0</span>
+                                        </div>
                                     </div>
-                                    <div class="total-amount-display">
-                                        <span>4 لينه:</span>
-                                        <span id="iron-total-4">0</span>
-                                    </div>
-                                    <div class="total-amount-display">
-                                        <span>5 لينه:</span>
-                                        <span id="iron-total-5">0</span>
+                                    <div class="movements-summary">
+                                        <div class="movement-total added">
+                                            <span>إجمالي المضاف:</span>
+                                            <span id="iron-total-added">0</span>
+                                        </div>
+                                        <div class="movement-total dispensed">
+                                            <span>إجمالي المصروف:</span>
+                                            <span id="iron-total-dispensed">0</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -155,10 +167,22 @@ try {
                         <div class="material-card" id="cement-card">
                              <div class="card-header">
                                 <h3>الأسمنت (بالشكارة)</h3>
-                                <div class="total-amount-display simple">
-                                    <span>الكمية الحالية:</span>
-                                    <span id="cement-total">0</span>
-                                    <span>شكارة</span>
+                                <div class="material-header-content">
+                                    <div class="total-amount-display simple">
+                                        <span>الكمية الحالية:</span>
+                                        <span id="cement-total">0</span>
+                                        <span>شكارة</span>
+                                    </div>
+                                    <div class="movements-summary">
+                                        <div class="movement-total added">
+                                            <span>إجمالي المضاف:</span>
+                                            <span id="cement-total-added">0</span>
+                                        </div>
+                                        <div class="movement-total dispensed">
+                                            <span>إجمالي المصروف:</span>
+                                            <span id="cement-total-dispensed">0</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -215,10 +239,22 @@ try {
                         <div class="material-card" id="other-card">
                             <div class="card-header">
                                 <h3>مواد أخرى (بالوحدة)</h3>
-                               <div class="total-amount-display simple">
-                                    <span>الكمية الحالية:</span>
-                                    <span id="other-total">0</span>
-                                     <span>وحدة</span>
+                                <div class="material-header-content">
+                                   <div class="total-amount-display simple">
+                                        <span>الكمية الحالية:</span>
+                                        <span id="other-total">0</span>
+                                         <span>وحدة</span>
+                                    </div>
+                                    <div class="movements-summary">
+                                        <div class="movement-total added">
+                                            <span>إجمالي المضاف:</span>
+                                            <span id="other-total-added">0</span>
+                                        </div>
+                                        <div class="movement-total dispensed">
+                                            <span>إجمالي المصروف:</span>
+                                            <span id="other-total-dispensed">0</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -429,10 +465,19 @@ try {
             allLogs[material] = [];
             let total = 0;
             let ironTotals = { '3': 0, '4': 0, '5': 0 };
+            let totalAdded = 0;
+            let totalDispensed = 0;
 
             snapshot.forEach(doc => {
                 const data = { id: doc.id, ...doc.data() };
                 allLogs[material].push(data);
+
+                if (data.quantity > 0) {
+                    totalAdded += data.quantity;
+                } else {
+                    totalDispensed += Math.abs(data.quantity);
+                }
+
                 if (material === 'iron') {
                     const type = data.ironType === 'حديد 3 لينه' ? '3' : data.ironType === 'حديد 4 لينه' ? '4' : '5';
                     if (ironTotals[type] !== undefined) ironTotals[type] += data.quantity;
@@ -440,6 +485,9 @@ try {
                     total += data.quantity;
                 }
             });
+
+            document.getElementById(`${material}-total-added`).textContent = totalAdded;
+            document.getElementById(`${material}-total-dispensed`).textContent = totalDispensed;
 
             if (material === 'iron') {
                 document.getElementById('iron-total-3').textContent = ironTotals['3'];
@@ -794,6 +842,8 @@ try {
     --bg-light: #f9fafb;
     --bg-white: #ffffff;
     --success-color: #10b981;
+    --success-bg-light: #f0fdf4;
+    --danger-bg-light: #fef2f2;
 }
 .auth-container { display: flex; align-items: center; justify-content: center; min-height: 80vh; }
 .remains-page { direction: rtl; font-family: 'Cairo', sans-serif; background-color: var(--bg-light); min-height: 100vh; padding: 2rem 1rem; }
@@ -809,13 +859,22 @@ h1 { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
 .materials-section { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
 
 .material-card { background-color: var(--bg-white); border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; }
-.card-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; background-color: #fdfdff; }
+.card-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 1.5rem; background-color: #fdfdff; }
 .card-header h3 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin: 0; }
 
+.material-header-content { display: flex; flex-direction: column; gap: 1rem; flex-grow: 1; }
 .iron-totals-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
 .total-amount-display { text-align: right; background-color: #f8f9fa; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);}
 .total-amount-display span:first-child { color: var(--text-light); font-size: 0.9rem; margin-left: 0.5rem; }
 .total-amount-display span:last-child { font-size: 1.25rem; font-weight: 700; color: var(--primary-color); }
+
+.movements-summary { display: flex; gap: 1rem; background-color: #f8f9fa; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); justify-content: space-around; }
+.movement-total { display: flex; flex-direction: column; align-items: center; }
+.movement-total span:first-child { font-size: 0.85rem; color: var(--text-light); font-weight: 600; }
+.movement-total span:last-child { font-size: 1.2rem; font-weight: 700; }
+.movement-total.added span:last-child { color: var(--success-color); }
+.movement-total.dispensed span:last-child { color: var(--danger-color); }
+
 
 .total-amount-display.simple { padding: 0.75rem 1.25rem; }
 .total-amount-display.simple span:first-child { font-size: 1rem; }
@@ -852,8 +911,8 @@ h1 { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
 .log-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
 .log-card-header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border-color); }
-.log-card-add .log-card-header { background-color: #f0fdf4; }
-.log-card-dispense .log-card-header { background-color: #fef2f2; }
+.log-card-add .log-card-header { background-color: var(--success-bg-light); }
+.log-card-dispense .log-card-header { background-color: var(--danger-bg-light); }
 
 .log-action-type { font-weight: 700; font-size: 1rem;}
 .log-card-add .log-action-type { color: var(--success-color); }
