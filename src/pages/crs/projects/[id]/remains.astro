@@ -286,7 +286,7 @@ try {
         <!-- Edit Modal -->
         <div id="edit-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
-                <button id="close-modal" class="modal-close">&times;</button>
+                <button class="modal-close">&times;</button>
                 <h3>تعديل السجل</h3>
                 <form id="edit-form">
                     <input type="hidden" name="docId">
@@ -313,6 +313,19 @@ try {
 
                     <button type="submit" class="btn-submit">حفظ التعديلات</button>
                 </form>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-confirm-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                 <button class="modal-close">&times;</button>
+                <h3>تأكيد الحذف</h3>
+                <p>هل أنت متأكد أنك تريد حذف هذا السجل؟ لا يمكن التراجع عن هذا الإجراء.</p>
+                <div class="modal-actions">
+                    <button id="cancel-delete-btn" class="btn-cancel">إلغاء</button>
+                    <button id="confirm-delete-btn" class="btn-submit btn-danger">تأكيد الحذف</button>
+                </div>
             </div>
         </div>
 
@@ -392,6 +405,7 @@ try {
     let userIsAdmin = false;
     let allLogs = { iron: [], cement: [], other: [] };
     let currentIronFilter = 'all';
+    let docIdToDelete = null;
 
     // --- GENERIC MATERIAL SECTION SETUP --- //
     function setupMaterialSection(material, projectId, user, userRole) {
@@ -628,22 +642,33 @@ try {
         const docId = target.dataset.id;
         const material = target.dataset.material;
         if (target.classList.contains('btn-delete')) {
-            handleDelete(docId);
+            openDeleteConfirmation(docId);
         } else if (target.classList.contains('btn-edit')) {
             openEditModal(docId, material);
         }
     }
 
-    async function handleDelete(docId) {
-        if (confirm('هل أنت متأكد أنك تريد حذف هذا السجل؟ لا يمكن التراجع عن هذا الإجراء.')) {
-            try {
-                await deleteDoc(doc(db, 'remains', docId));
-                alert('تم الحذف بنجاح!');
-            } catch (error) {
-                console.error("Error deleting document: ", error);
-                alert('حدث خطأ أثناء الحذف.');
-            }
+    function openDeleteConfirmation(docId) {
+        docIdToDelete = docId;
+        document.getElementById('delete-confirm-modal').style.display = 'flex';
+    }
+
+    async function handleDelete() {
+        if (!docIdToDelete) return;
+        try {
+            await deleteDoc(doc(db, 'remains', docIdToDelete));
+            alert('تم الحذف بنجاح!');
+        } catch (error) {
+            console.error("Error deleting document: ", error);
+            alert('حدث خطأ أثناء الحذف.');
+        } finally {
+            closeDeleteConfirmation();
         }
+    }
+
+     function closeDeleteConfirmation() {
+        docIdToDelete = null;
+        document.getElementById('delete-confirm-modal').style.display = 'none';
     }
 
     function openEditModal(docId, material) {
@@ -670,43 +695,51 @@ try {
         modal.style.display = 'flex';
     }
 
-    document.getElementById('edit-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const docId = form.docId.value;
-        const material = form.material.value;
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.disabled = true; submitBtn.textContent = 'جارٍ الحفظ...';
-        
-        try {
-            const newQuantity = parseInt(form.quantity.value, 10);
-            if(isNaN(newQuantity) || newQuantity < 0) throw new Error("الكمية يجب أن تكون رقمًا موجبًا.");
+    document.addEventListener('DOMContentLoaded', () => {
+        // Edit Modal
+        const editModal = document.getElementById('edit-modal');
+        editModal.querySelector('.modal-close').addEventListener('click', () => editModal.style.display = 'none');
+        document.getElementById('edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const docId = form.docId.value;
+            const material = form.material.value;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true; submitBtn.textContent = 'جارٍ الحفظ...';
             
-            const originalEntry = allLogs[material]?.find(log => log.id === docId);
-            if (!originalEntry) throw new Error("لم يتم العثور على السجل الأصلي.");
+            try {
+                const newQuantity = parseInt(form.quantity.value, 10);
+                if(isNaN(newQuantity) || newQuantity < 0) throw new Error("الكمية يجب أن تكون رقمًا موجبًا.");
+                
+                const originalEntry = allLogs[material]?.find(log => log.id === docId);
+                if (!originalEntry) throw new Error("لم يتم العثور على السجل الأصلي.");
 
-            let updatedData = {
-                notes: form.notes.value,
-                quantity: originalEntry.quantity > 0 ? newQuantity : -newQuantity,
-            };
+                let updatedData = {
+                    notes: form.notes.value,
+                    quantity: originalEntry.quantity > 0 ? newQuantity : -newQuantity,
+                };
 
-            if (material === 'iron') {
-                updatedData.ironType = form.ironType.value;
+                if (material === 'iron') {
+                    updatedData.ironType = form.ironType.value;
+                }
+                
+                await updateDoc(doc(db, 'remains', docId), updatedData);
+                alert('تم التعديل بنجاح!');
+                document.getElementById('edit-modal').style.display = 'none';
+            } catch(error) {
+                alert(error.message || 'فشل تحديث السجل.');
+            } finally {
+                submitBtn.disabled = false; submitBtn.textContent = 'حفظ التعديلات';
             }
-            
-            await updateDoc(doc(db, 'remains', docId), updatedData);
-            alert('تم التعديل بنجاح!');
-            document.getElementById('edit-modal').style.display = 'none';
-        } catch(error) {
-            alert(error.message || 'فشل تحديث السجل.');
-        } finally {
-            submitBtn.disabled = false; submitBtn.textContent = 'حفظ التعديلات';
-        }
+        });
+
+        // Delete Modal
+        const deleteModal = document.getElementById('delete-confirm-modal');
+        deleteModal.querySelector('.modal-close').addEventListener('click', closeDeleteConfirmation);
+        document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteConfirmation);
+        document.getElementById('confirm-delete-btn').addEventListener('click', handleDelete);
     });
-    
-    document.getElementById('close-modal').addEventListener('click', () => {
-        document.getElementById('edit-modal').style.display = 'none';
-    });
+
 
     // --- INITIALIZATION & HELPERS --- //
     async function getSupervisorNames(ids) { 
@@ -844,12 +877,20 @@ h1 { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
 .btn-show-all { background-color: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 1rem; align-self: center; transition: all 0.2s;}
 .btn-show-all:hover { background-color: #eef5ff; }
 
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000;}
-.modal-content { direction: rtl; background: white; padding: 2.5rem; border-radius: 12px; width: 90%; max-width: 500px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1);}
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000;}
+.modal-content { direction: rtl; background: white; padding: 2.5rem; border-radius: 12px; width: 90%; max-width: 500px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
 .modal-close { position: absolute; top: 1rem; left: 1rem; background: none; border: none; font-size: 1.75rem; cursor: pointer; color: #9ca3af;}
-.modal-content h3 { font-size: 1.5rem; margin-top: 0; margin-bottom: 2rem; color: var(--text-dark); text-align: center; }
-#edit-form .form-group { margin-bottom: 1.5rem; }
+.modal-content h3 { font-size: 1.5rem; margin-top: 0; margin-bottom: 1rem; color: var(--text-dark); }
+.modal-content p { margin-bottom: 2rem; color: var(--text-light); font-size: 1rem; }
+
+#edit-form .form-group { margin-bottom: 1.5rem; text-align: right; }
 #edit-form .btn-submit { width: 100%; padding: 1rem; }
+
+.modal-actions { display: flex; justify-content: center; gap: 1rem; }
+.btn-cancel { background-color: #e5e7eb; color: var(--text-dark); border: none; padding: .85rem 2rem; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 700; transition: background-color 0.2s; }
+.btn-cancel:hover { background-color: #d1d5db; }
+.btn-danger { background-color: var(--danger-color); }
+.btn-danger:hover { background-color: #dc2626; }
 
 .iron-filter-controls { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; background-color: var(--bg-white); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); }
 .filter-group { display: flex; align-items: center; gap: 0.75rem; }
