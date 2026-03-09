@@ -54,7 +54,7 @@ try {
                         <!-- Iron Card -->
                         <div class="material-card" id="iron-card">
                             <div class="card-header">
-                                <h3>الحديد (بالسيخ)</h3>
+                                <h3>الحديد (بالسيخ والكانات)</h3>
                                 <div class="material-header-content">
                                     <div class="totals-grid">
                                         <div class="total-amount-display">
@@ -69,15 +69,40 @@ try {
                                             <span>5 لينه:</span>
                                             <span id="iron-total-5">0</span>
                                         </div>
-                                    </div>
-                                    <div class="movements-summary">
-                                        <div class="movement-total added">
-                                            <span>إجمالي المضاف:</span>
-                                            <span id="iron-total-added">0</span>
+                                        <div class="total-amount-display">
+                                            <span>كانات 6مللي:</span>
+                                            <span id="iron-total-stirrups6">0</span>
                                         </div>
-                                        <div class="movement-total dispensed">
-                                            <span>إجمالي المصروف:</span>
-                                            <span id="iron-total-dispensed">0</span>
+                                        <div class="total-amount-display">
+                                            <span>كانات 8مللي:</span>
+                                            <span id="iron-total-stirrups8">0</span>
+                                        </div>
+                                    </div>
+                                    <div class="movements-breakdown">
+                                        <div class="movement-breakdown-item">
+                                            <span class="movement-subtype-label">3 لينه:</span>
+                                            <span class="movement-value added">مضاف: <span id="iron-added-3">0</span></span>
+                                            <span class="movement-value dispensed">مصروف: <span id="iron-dispensed-3">0</span></span>
+                                        </div>
+                                        <div class="movement-breakdown-item">
+                                            <span class="movement-subtype-label">4 لينه:</span>
+                                            <span class="movement-value added">مضاف: <span id="iron-added-4">0</span></span>
+                                            <span class="movement-value dispensed">مصروف: <span id="iron-dispensed-4">0</span></span>
+                                        </div>
+                                        <div class="movement-breakdown-item">
+                                            <span class="movement-subtype-label">5 لينه:</span>
+                                            <span class="movement-value added">مضاف: <span id="iron-added-5">0</span></span>
+                                            <span class="movement-value dispensed">مصروف: <span id="iron-dispensed-5">0</span></span>
+                                        </div>
+                                        <div class="movement-breakdown-item">
+                                            <span class="movement-subtype-label">كانات 6 مللي:</span>
+                                            <span class="movement-value added">مضاف: <span id="iron-added-stirrups6">0</span></span>
+                                            <span class="movement-value dispensed">مصروف: <span id="iron-dispensed-stirrups6">0</span></span>
+                                        </div>
+                                        <div class="movement-breakdown-item">
+                                            <span class="movement-subtype-label">كانات 8 مللي:</span>
+                                            <span class="movement-value added">مضاف: <span id="iron-added-stirrups8">0</span></span>
+                                            <span class="movement-value dispensed">مصروف: <span id="iron-dispensed-stirrups8">0</span></span>
                                         </div>
                                     </div>
                                 </div>
@@ -89,7 +114,7 @@ try {
                                         <button class="toggle-btn" data-form="dispense-iron-form">صرف</button>
                                     </div>
                                     <form id="add-iron-form" class="material-form">
-                                        <h4>إضافة عدد أسياخ</h4>
+                                        <h4>إضافة حديد</h4>
                                         <div class="form-fields">
                                             <div class="form-row">
                                                 <div class="form-group">
@@ -98,10 +123,12 @@ try {
                                                         <option value="حديد 3 لينه">حديد 3 لينه</option>
                                                         <option value="حديد 4 لينه">حديد 4 لينه</option>
                                                         <option value="حديد 5 لينه">حديد 5 لينه</option>
+                                                        <option value="حديد كانات 6 مللي">كانات 6 مللي</option>
+                                                        <option value="حديد كانات 8 مللي">كانات 8 مللي</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="add-iron-quantity">عدد الأسياخ</label>
+                                                    <label for="add-iron-quantity" class="quantity-label">عدد الأسياخ</label>
                                                     <input type="number" id="add-iron-quantity" name="quantity" step="1" required placeholder="150">
                                                 </div>
                                             </div>
@@ -115,7 +142,7 @@ try {
                                         </div>
                                     </form>
                                     <form id="dispense-iron-form" class="material-form" style="display: none;">
-                                         <h4>صرف عدد أسياخ</h4>
+                                         <h4>صرف حديد</h4>
                                         <div class="form-fields">
                                             <div class="form-row">
                                                 <div class="form-group">
@@ -124,10 +151,12 @@ try {
                                                         <option value="حديد 3 لينه">حديد 3 لينه</option>
                                                         <option value="حديد 4 لينه">حديد 4 لينه</option>
                                                         <option value="حديد 5 لينه">حديد 5 لينه</option>
+                                                        <option value="حديد كانات 6 مللي">كانات 6 مللي</option>
+                                                        <option value="حديد كانات 8 مللي">كانات 8 مللي</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="dispense-iron-quantity">عدد الأسياخ</label>
+                                                    <label for="dispense-iron-quantity" class="quantity-label">عدد الأسياخ</label>
                                                     <input type="number" id="dispense-iron-quantity" name="quantity" step="1" required placeholder="50">
                                                 </div>
                                             </div>
@@ -152,6 +181,8 @@ try {
                                                     <button class="filter-btn" data-material="iron" data-filter-type="subType" data-filter-value="حديد 3 لينه">3 لينه</button>
                                                     <button class="filter-btn" data-material="iron" data-filter-type="subType" data-filter-value="حديد 4 لينه">4 لينه</button>
                                                     <button class="filter-btn" data-material="iron" data-filter-type="subType" data-filter-value="حديد 5 لينه">5 لينه</button>
+                                                    <button class="filter-btn" data-material="iron" data-filter-type="subType" data-filter-value="حديد كانات 6 مللي">كانات 6</button>
+                                                    <button class="filter-btn" data-material="iron" data-filter-type="subType" data-filter-value="حديد كانات 8 مللي">كانات 8</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -462,7 +493,7 @@ try {
                             <dd data-key="subType"></dd>
                         </div>
                         <div class="log-detail-item">
-                            <dt data-key-quantity-label>الكمية</dt>
+                            <dt data-key="quantity-label">الكمية</dt>
                             <dd data-key="quantity"></dd>
                         </div>
                         <div class="log-detail-item">
@@ -526,13 +557,34 @@ try {
     let currentFilters = { iron: 'all', other: 'all' };
     let docIdToDelete = null;
 
+    // This object will hold the live totals for all materials.
+    let liveTotals = {
+        iron: { '3': 0, '4': 0, '5': 0, stirrups6: 0, stirrups8: 0 },
+        cement: 0,
+        other: { sapa: 0, liquids: 0, misc: 0 }
+    };
+
     const standardSubTypes = {
-        iron: ["حديد 3 لينه", "حديد 4 لينه", "حديد 5 لينه"],
+        iron: ["حديد 3 لينه", "حديد 4 لينه", "حديد 5 لينه", "حديد كانات 6 مللي", "حديد كانات 8 مللي"],
         other: ["مواد صبة", "سوائل"]
     };
     const standardUnits = { 
         other: ["قطعة", "لتر"] 
     };
+
+    // --- DYNAMIC LABEL CHANGE HANDLER ---
+    function handleIronTypeChange(event) {
+        const selectedValue = event.target.value;
+        const form = event.target.closest('form');
+        const quantityLabel = form.querySelector('.quantity-label');
+        if (quantityLabel) {
+            if (selectedValue.includes('كانات')) {
+                quantityLabel.textContent = 'عدد الكانات';
+            } else {
+                quantityLabel.textContent = 'عدد الأسياخ';
+            }
+        }
+    }
 
     // --- GENERIC MATERIAL SECTION SETUP --- //
     function setupMaterialSection(material, projectId, user, userRole) {
@@ -551,54 +603,84 @@ try {
             });
         });
 
+        if (material === 'iron') {
+            card.querySelectorAll('select[name="subType"]').forEach(select => {
+                select.addEventListener('change', handleIronTypeChange);
+                 // Trigger it once on load to set the initial correct label
+                handleIronTypeChange({ target: select });
+            });
+        }
+
         const remainsQuery = query(collection(db, 'remains'), where("projectId", "==", projectId), where("material", "==", material), orderBy("createdAt", "desc"));
         onSnapshot(remainsQuery, (snapshot) => {
             allLogs[material] = [];
-            let totals = { sapa: 0, liquids: 0, misc: 0, '3': 0, '4': 0, '5': 0 };
-            let totalAdded = 0;
-            let totalDispensed = 0;
-            let simpleTotal = 0;
+            // Reset totals before recalculating
+            liveTotals.iron = { '3': 0, '4': 0, '5': 0, stirrups6: 0, stirrups8: 0 };
+            liveTotals.cement = 0;
+            liveTotals.other = { sapa: 0, liquids: 0, misc: 0 };
+
+            let movementTotals = { '3': {added: 0, dispensed: 0}, '4': {added: 0, dispensed: 0}, '5': {added: 0, dispensed: 0}, stirrups6: {added: 0, dispensed: 0}, stirrups8: {added: 0, dispensed: 0} };
+            let simpleTotalAdded = 0;
+            let simpleTotalDispensed = 0;
 
             snapshot.forEach(doc => {
                 const data = { id: doc.id, ...doc.data() };
                 allLogs[material].push(data);
-
-                const quantity = Math.abs(data.quantity);
-                if (data.quantity > 0) {
-                    totalAdded += quantity;
-                } else {
-                    totalDispensed += quantity;
-                }
+                const quantity = data.quantity;
+                const absQuantity = Math.abs(quantity);
 
                 if (material === 'iron') {
-                    const type = data.subType === 'حديد 3 لينه' ? '3' : data.subType === 'حديد 4 لينه' ? '4' : '5';
-                    if (totals[type] !== undefined) totals[type] += data.quantity;
+                    let subTypeKey = null;
+                    if (data.subType === 'حديد 3 لينه') subTypeKey = '3';
+                    else if (data.subType === 'حديد 4 لينه') subTypeKey = '4';
+                    else if (data.subType === 'حديد 5 لينه') subTypeKey = '5';
+                    else if (data.subType === 'حديد كانات 6 مللي') subTypeKey = 'stirrups6';
+                    else if (data.subType === 'حديد كانات 8 مللي') subTypeKey = 'stirrups8';
+
+                    if(subTypeKey) {
+                        liveTotals.iron[subTypeKey] += quantity;
+                        if (quantity > 0) {
+                            movementTotals[subTypeKey].added += absQuantity;
+                        } else {
+                            movementTotals[subTypeKey].dispensed += absQuantity;
+                        }
+                    }
                 } else if (material === 'other') {
-                    let typeKey;
+                    let typeKey = 'misc';
                     if (data.subType === 'مواد صبة') typeKey = 'sapa';
                     else if (data.subType === 'سوائل') typeKey = 'liquids';
-                    else typeKey = 'misc';
-                    if (totals[typeKey] !== undefined) totals[typeKey] += data.quantity;
+                    liveTotals.other[typeKey] += quantity;
                 } else {
-                    simpleTotal += data.quantity;
+                    liveTotals.cement += quantity;
                 }
+
+                if(data.quantity > 0) simpleTotalAdded += absQuantity; else simpleTotalDispensed += absQuantity;
             });
 
-            if (document.getElementById(`${material}-total-added`)) {
-                 document.getElementById(`${material}-total-added`).textContent = totalAdded;
-                 document.getElementById(`${material}-total-dispensed`).textContent = totalDispensed;
-            }
-
+            // Update UI
             if (material === 'iron') {
-                document.getElementById('iron-total-3').textContent = totals['3'];
-                document.getElementById('iron-total-4').textContent = totals['4'];
-                document.getElementById('iron-total-5').textContent = totals['5'];
+                for (const key in liveTotals.iron) {
+                    const totalEl = document.getElementById(`iron-total-${key}`);
+                    if(totalEl) totalEl.textContent = liveTotals.iron[key];
+                }
+                for (const key in movementTotals) {
+                    const addedEl = document.getElementById(`iron-added-${key}`);
+                    const dispensedEl = document.getElementById(`iron-dispensed-${key}`);
+                    if(addedEl) addedEl.textContent = movementTotals[key].added;
+                    if(dispensedEl) dispensedEl.textContent = movementTotals[key].dispensed;
+                }
+
             } else if (material === 'other') {
-                 document.getElementById('other-total-sapa').textContent = totals['sapa'];
-                document.getElementById('other-total-liquids').textContent = totals['liquids'];
-                document.getElementById('other-total-misc').textContent = totals['misc'];
-            } else {
-                document.getElementById(`${material}-total`).textContent = simpleTotal;
+                 for (const key in liveTotals.other) {
+                    const totalEl = document.getElementById(`other-total-${key}`);
+                    if(totalEl) totalEl.textContent = liveTotals.other[key];
+                }
+                 document.getElementById(`${material}-total-added`).textContent = simpleTotalAdded;
+                 document.getElementById(`${material}-total-dispensed`).textContent = simpleTotalDispensed;
+            } else { // For simple materials like cement
+                document.getElementById(`${material}-total`).textContent = liveTotals.cement;
+                document.getElementById(`${material}-total-added`).textContent = simpleTotalAdded;
+                document.getElementById(`${material}-total-dispensed`).textContent = simpleTotalDispensed;
             }
 
             if (userRole === 'admin') {
@@ -700,10 +782,11 @@ try {
             const subTypeDisplay = (material === 'iron') ? (entry.subType || '').replace('حديد', '').trim() : (entry.subType || 'غير محدد');
             cardClone.querySelector('[data-key="subType"]').textContent = subTypeDisplay;
 
-            const quantityLabel = cardClone.querySelector('[data-key-quantity-label]');
-            quantityLabel.textContent = (material === 'iron') ? 'عدد الأسياخ' : 'الكمية';
+            const quantityLabelDt = cardClone.querySelector('[data-key="quantity-label"]');
+            const isStirrup = entry.subType && entry.subType.includes('كانات');
+            if (quantityLabelDt) quantityLabelDt.textContent = isStirrup ? 'عدد الكانات' : 'عدد الأسياخ';
             
-            const unit = entry.unit || (material === 'iron' ? 'سيخ' : 'وحدة');
+            const unit = isStirrup ? 'كانة' : 'سيخ';
             cardClone.querySelector('[data-key="quantity"]').textContent = `${Math.abs(entry.quantity)} ${unit}`;
 
             cardClone.querySelector('[data-key="supervisor"]').textContent = supervisorName;
@@ -765,12 +848,45 @@ try {
         e.preventDefault();
         const form = e.target;
         const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.disabled = true; submitBtn.textContent = 'جارٍ الحفظ...';
+        
+        const quantity = parseInt(form.quantity.value, 10);
+        if (isNaN(quantity) || quantity <= 0) {
+            alert('يرجى إدخال كمية صحيحة موجبة.');
+            return;
+        }
+
+        if (isDispense) {
+            let currentStock = 0;
+            let subTypeKey;
+
+            if (material === 'iron') {
+                const subType = form.subType.value;
+                if (subType === 'حديد 3 لينه') subTypeKey = '3';
+                else if (subType === 'حديد 4 لينه') subTypeKey = '4';
+                else if (subType === 'حديد 5 لينه') subTypeKey = '5';
+                else if (subType === 'حديد كانات 6 مللي') subTypeKey = 'stirrups6';
+                else if (subType === 'حديد كانات 8 مللي') subTypeKey = 'stirrups8';
+                currentStock = liveTotals.iron[subTypeKey] || 0;
+            } else if (material === 'cement') {
+                currentStock = liveTotals.cement || 0;
+            } else if (material === 'other') {
+                const subType = form.subType.value;
+                if(subType === 'مواد صبة') subTypeKey = 'sapa';
+                else if (subType === 'سوائل') subTypeKey = 'liquids';
+                else subTypeKey = 'misc';
+                currentStock = liveTotals.other[subTypeKey] || 0;
+            }
+
+            if (quantity > currentStock) {
+                alert(`لا يمكن صرف كمية أكبر من الرصيد الحالي (${currentStock}).`);
+                return;
+            }
+        }
+
+        submitBtn.disabled = true; 
+        submitBtn.textContent = 'جارٍ الحفظ...';
 
         try {
-            const quantity = parseInt(form.quantity.value, 10);
-            if (isNaN(quantity) || quantity <= 0) throw new Error('يرجى إدخال كمية صحيحة موجبة.');
-            
             let supervisorName = user.email || 'مستخدم غير معروف'; 
             try {
                 const userDocRef = doc(db, 'users', user.uid);
@@ -791,7 +907,6 @@ try {
                 createdAt: serverTimestamp()
             };
             
-            // Handle subType for iron and other
             if (standardSubTypes[material]) {
                 let subType = form.subType.value;
                 if (subType === 'أخرى') {
@@ -801,7 +916,6 @@ try {
                 data.subType = subType;
             }
 
-            // Handle unit for other
             if (material === 'other') {
                 let unit = form.unit.value;
                 if (unit === 'أخرى') {
@@ -822,6 +936,9 @@ try {
             submitBtn.disabled = false;
             const buttonText = form.id.includes('dispense') ? 'صرف' : 'إضافة';
             submitBtn.textContent = buttonText;
+             if (material === 'iron') {
+                handleIronTypeChange({ target: form.querySelector('select[name="subType"]') });
+            }
         }
     }
 
@@ -915,8 +1032,14 @@ try {
         } else {
             unitGroup.style.display = 'none';
         }
+        
+        const quantityLabel = document.getElementById('edit-quantity-label');
+        if (material === 'iron') {
+            quantityLabel.textContent = entry.subType && entry.subType.includes('كانات') ? 'عدد الكانات' : 'عدد الأسياخ';
+        } else {
+            quantityLabel.textContent = 'الكمية';
+        }
 
-        document.getElementById('edit-quantity-label').textContent = material === 'iron' ? 'عدد الأسياخ' : 'الكمية';
         form.quantity.value = Math.abs(entry.quantity);
         form.notes.value = entry.notes || '';
         
@@ -1056,7 +1179,7 @@ h1 { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
 .card-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 1.5rem; background-color: #fdfdff; }
 .card-header h3 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin: 0; }
 
-.material-header-content { display: flex; flex-direction: column; gap: 1rem; flex-grow: 1; }
+.material-header-content { display: flex; flex-direction: column; gap: 1.5rem; flex-grow: 1; }
 .totals-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
 .total-amount-display { text-align: right; background-color: #f8f9fa; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);}
 .total-amount-display span:first-child { color: var(--text-light); font-size: 0.9rem; margin-left: 0.5rem; }
@@ -1069,6 +1192,12 @@ h1 { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
 .movement-total.added span:last-child { color: var(--success-color); }
 .movement-total.dispensed span:last-child { color: var(--danger-color); }
 
+.movements-breakdown { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; background-color: #f8f9fa; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); }
+.movement-breakdown-item { display: flex; flex-direction: column; background-color: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e5e7eb;}
+.movement-subtype-label { font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; text-align: center; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;}
+.movement-value { display: flex; justify-content: space-between; font-size: 0.9rem;}
+.movement-value.added span { color: var(--success-color); font-weight: 600;}
+.movement-value.dispensed span { color: var(--danger-color); font-weight: 600;}
 
 .total-amount-display.simple { padding: 0.75rem 1.25rem; }
 .total-amount-display.simple span:first-child { font-size: 1rem; }
