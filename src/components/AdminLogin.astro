@@ -15,11 +15,11 @@
 </div>
 
 <script>
-  const loginForm = document.getElementById("login-form")! as HTMLFormElement;
-  const emailInput = document.getElementById("email")! as HTMLInputElement;
-  const passwordInput = document.getElementById("password")! as HTMLInputElement;
-  const errorMessage = document.getElementById("error-message")!;
-  const loginButton = loginForm.querySelector('button[type="submit"]')! as HTMLButtonElement;
+  const loginForm = document.getElementById("login-form");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const errorMessage = document.getElementById("error-message");
+  const loginButton = loginForm.querySelector('button[type="submit"]');
 
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -38,6 +38,10 @@
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // Store token in localStorage for simple browsers compatibility
+        if (data.token) {
+          localStorage.setItem('auth_token', data.token);
+        }
         window.location.reload();
       } else {
         errorMessage.textContent = data.error || "البريد الإلكتروني أو كلمة المرور غير صالحة.";

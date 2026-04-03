@@ -9,11 +9,17 @@ export async function GET({ request }) {
         const cookies = cookie.parse(cookieHeader);
         const token = cookies.auth_token;
 
-        if (!token) {
+        // Check for token in Authorization header (for localStorage/simple browsers)
+        const authHeader = request.headers.get("authorization");
+        const headerToken = authHeader?.replace("Bearer ", "");
+
+        const finalToken = token || headerToken;
+
+        if (!finalToken) {
             return new Response(JSON.stringify({ authenticated: false, message: "No token found" }), { status: 401 });
         }
 
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(finalToken, JWT_SECRET);
 
         return new Response(JSON.stringify({
             authenticated: true,

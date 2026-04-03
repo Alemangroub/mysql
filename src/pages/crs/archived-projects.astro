@@ -222,7 +222,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
           const response = await fetch('/api/projects?archived=true');
           const projects = await response.json();
 
-          if(tableWrapper) tableWrapper.style.display = projects.length === 0 ? 'none' : '';
+          if(tableWrapper) tableWrapper.style.display = projects.length === 0 ? 'none' : 'block';
           if(noProjectsMessage) noProjectsMessage.textContent = projects.length === 0 ? 'لا توجد مشاريع مؤرشفة حالياً.' : '';
 
           if (projectsList) {
@@ -234,8 +234,8 @@ import AdminLogin from '../../components/AdminLogin.astro';
                       <td data-label="العنوان">${project.projectAddress || '-'}</td>
                       <td data-label="المشرفون">${supervisors}</td>
                       <td data-label="الإجراءات" class="btn-action-cell">
-                        <button class="btn-unarchive-custom" onclick="window.handleUnarchive('${project.id}')">إلغاء الأرشفة</button>
-                        <button class="btn-delete-custom" onclick="window.handleDelete('${project.id}')">حذف</button>
+                        <button class="btn-unarchive-custom" data-id="${project.id}">إلغاء الأرشفة</button>
+                        <button class="btn-delete-custom" data-id="${project.id}">حذف</button>
                       </td>
                     </tr>
                   `;
@@ -261,7 +261,6 @@ import AdminLogin from '../../components/AdminLogin.astro';
       confirmDeleteBtn?.addEventListener('click', async () => {
           if (!projectIdToDelete) return;
           try {
-              // Note: You should have a delete project API
               const res = await fetch('/api/projects/delete', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -278,7 +277,7 @@ import AdminLogin from '../../components/AdminLogin.astro';
           if (!projectIdToUnarchive) return;
           try {
               const res = await fetch('/api/projects/update', {
-                  method: 'POST',
+                  method: 'PATCH',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ id: projectIdToUnarchive, archived: false })
               });
@@ -289,14 +288,21 @@ import AdminLogin from '../../components/AdminLogin.astro';
           } catch (error) { console.error(error); }
       });
 
-      (window as any).handleDelete = (id: string) => {
-          projectIdToDelete = id;
-          deleteModal?.classList.add('visible');
-      };
-
-      (window as any).handleUnarchive = (id: string) => {
-          projectIdToUnarchive = id;
-          unarchiveModal?.classList.add('visible');
-      };
+      // Event delegation for button clicks
+      const projectsList = document.getElementById('projects-list');
+      if (projectsList) {
+          projectsList.addEventListener('click', (e) => {
+              const target = e.target;
+              if (target instanceof HTMLElement) {
+                  if (target.classList.contains('btn-delete-custom')) {
+                      projectIdToDelete = target.dataset.id;
+                      deleteModal?.classList.add('visible');
+                  } else if (target.classList.contains('btn-unarchive-custom')) {
+                      projectIdToUnarchive = target.dataset.id;
+                      unarchiveModal?.classList.add('visible');
+                  }
+              }
+          });
+      }
   }
 </script>

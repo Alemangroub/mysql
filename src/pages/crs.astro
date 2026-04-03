@@ -34,26 +34,41 @@ import AdminLogin from '../components/AdminLogin.astro';
 <script>
   import { checkAuth, logout } from '../lib/auth.js';
 
-  const authLoadingMessage = document.getElementById('auth-loading-message')!;
-  const loginContainer = document.getElementById('admin-login-container')!;
-  const dashboardContainer = document.getElementById('admin-dashboard-container')!;
-  const logoutButton = document.getElementById('logout-button')!;
+  const authLoadingMessage = document.getElementById('auth-loading-message');
+  const loginContainer = document.getElementById('admin-login-container');
+  const dashboardContainer = document.getElementById('admin-dashboard-container');
+  const logoutButton = document.getElementById('logout-button');
+
+  // Add timeout to prevent infinite loading
+  const timeout = setTimeout(() => {
+    console.log('Auth check timeout - showing login');
+    authLoadingMessage.style.display = 'none';
+    loginContainer.style.display = 'block';
+  }, 5000);
 
   (async () => {
-    const user = await checkAuth();
-    authLoadingMessage.style.display = 'none';
+    try {
+      const user = await checkAuth();
+      clearTimeout(timeout);
+      authLoadingMessage.style.display = 'none';
 
-    if (user) {
-      if (user.role === 'admin') {
-        dashboardContainer.style.display = 'block';
-        loginContainer.style.display = 'none';
-      } else if (user.role === 'supervisor') {
-        window.location.href = '/dashboard';
+      if (user) {
+        if (user.role === 'admin') {
+          dashboardContainer.style.display = 'block';
+          loginContainer.style.display = 'none';
+        } else if (user.role === 'supervisor') {
+          window.location.href = '/dashboard';
+        } else {
+          loginContainer.style.display = 'block';
+        }
       } else {
+        dashboardContainer.style.display = 'none';
         loginContainer.style.display = 'block';
       }
-    } else {
-      dashboardContainer.style.display = 'none';
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      clearTimeout(timeout);
+      authLoadingMessage.style.display = 'none';
       loginContainer.style.display = 'block';
     }
   })();

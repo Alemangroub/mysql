@@ -1,23 +1,36 @@
 /**
  * Client-side authentication helper.
- * Replaces Firebase onAuthStateChanged with a simple API check.
+ * Works with both cookies and localStorage for maximum compatibility.
  */
 
 export async function checkAuth() {
   try {
-    const response = await fetch('/api/auth/me');
+    const token = localStorage.getItem('auth_token');
+    const headers = {};
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await fetch('/api/auth/me', { headers });
     if (!response.ok) return null;
     const data = await response.json();
     if (data.authenticated) {
       return data.user;
     }
     return null;
-  } catch {
+  } catch (error) {
+    console.error('Auth check error:', error);
     return null;
   }
 }
 
 export async function logout() {
+  localStorage.removeItem('auth_token');
   await fetch('/api/auth/logout', { method: 'POST' });
   window.location.href = '/crs';
+}
+
+export function setAuthToken(token) {
+  localStorage.setItem('auth_token', token);
 }
