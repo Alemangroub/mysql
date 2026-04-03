@@ -19,7 +19,21 @@ export async function GET({ url }) {
             where: where,
             orderBy: { createdAt: 'desc' }
         });
-        return new Response(JSON.stringify(logs), { status: 200 });
+        
+        // Get unique supervisor IDs and fetch their names
+        const supervisorIds = [...new Set(logs.map(l => l.supervisorId).filter(Boolean))];
+        const supervisors = supervisorIds.length > 0 ? await prisma.user.findMany({
+            where: { id: { in: supervisorIds } },
+            select: { id: true, name: true }
+        }) : [];
+        const supervisorMap = Object.fromEntries(supervisors.map(s => [s.id, s.name]));
+        
+        const formattedLogs = logs.map(log => ({
+            ...log,
+            supervisorName: log.supervisorName || supervisorMap[log.supervisorId] || log.supervisorId || 'غير معروف'
+        }));
+        
+        return new Response(JSON.stringify(formattedLogs), { status: 200 });
     } catch (error) {
         console.error("Error fetching remains logs:", error);
         return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
