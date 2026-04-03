@@ -7,11 +7,11 @@ export async function GET() {
         const adminCount = await prisma.user.count({ where: { role: 'admin' } });
         
         if (adminCount === 0) {
-            const hashedPassword = await bcrypt.hash('admin123', 10);
+            const hashedPassword = await bcrypt.hash('11223344', 10);
             const admin = await prisma.user.create({
                 data: {
                     name: 'مدير النظام',
-                    email: 'admin@eleman.com',
+                    email: '1@1.com',
                     password: hashedPassword,
                     role: 'admin'
                 }
@@ -19,7 +19,7 @@ export async function GET() {
             return new Response(JSON.stringify({
                 success: true,
                 message: 'تم إنشاء حساب المدير بنجاح!',
-                credentials: { email: 'admin@eleman.com', password: 'admin123' }
+                credentials: { email: '1@1.com', password: '11223344' }
             }), { status: 201 });
         }
 
