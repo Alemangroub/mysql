@@ -45,15 +45,22 @@ model ProjectSupervisor {
 }
 
 model Item {
-  id         String   @id @default(uuid())
-  projectId  String
-  name       String
-  personName String
-  quantity   Float
-  unitPrice  Float
-  totalPrice Float
-  createdAt  DateTime @default(now())
-  project    Project  @relation(fields: [projectId], references: [id])
+  id            String   @id @default(uuid())
+  projectId     String
+  name          String
+  personName    String?
+  specificName  String?
+  floor         String?
+  quantity      Float?
+  unitPrice     Float?
+  pricePerMeter Float?
+  pricePerUnit  Float?
+  area          Float?
+  unit          String?
+  totalPrice    Float
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now())
+  project       Project  @relation(fields: [projectId], references: [id])
 
   @@index([projectId], map: "Item_projectId_fkey")
 }
