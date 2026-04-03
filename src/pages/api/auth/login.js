@@ -2,7 +2,7 @@ import prisma from "../../../lib/prisma.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-for-dev-only";
+const JWT_SECRET = import.meta.env.JWT_SECRET || "fallback-secret-for-dev-only";
 
 export async function POST({ request }) {
     try {

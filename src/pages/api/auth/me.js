@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import cookie from "cookie";
 
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-for-dev-only";
+const JWT_SECRET = import.meta.env.JWT_SECRET || "fallback-secret-for-dev-only";
 
 export async function GET({ request }) {
     try {
@@ -10,7 +10,7 @@ export async function GET({ request }) {
         const token = cookies.auth_token;
 
         if (!token) {
-            return new Response(JSON.stringify({ authenticated: false }), { status: 401 });
+            return new Response(JSON.stringify({ authenticated: false, message: "No token found" }), { status: 401 });
         }
 
         const decoded = jwt.verify(token, JWT_SECRET);
@@ -26,6 +26,7 @@ export async function GET({ request }) {
         }), { status: 200 });
 
     } catch (error) {
-        return new Response(JSON.stringify({ authenticated: false }), { status: 401 });
+        console.error("JWT Verification Error:", error.message);
+        return new Response(JSON.stringify({ authenticated: false, error: error.message }), { status: 401 });
     }
 }

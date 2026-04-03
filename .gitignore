@@ -21,3 +21,4 @@ schema.prisma.backup
 serviceAccountKey.json
 firebase.json
 .firebaserc
+node_modules
