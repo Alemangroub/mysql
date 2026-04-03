@@ -148,15 +148,65 @@ import AdminLogin from '../../components/AdminLogin.astro';
 
       emptyMsg.style.display = 'none';
       container.style.display = 'grid';
-      container.innerHTML = items.map(item => `
-          <a href="/crs/contract-details?projectId=${projectId}&customerName=${encodeURIComponent(item.customerName)}" class="installment-card ${type}">
-              <div class="card-header">${item.customerName}</div>
-              <div class="card-details">
-                  <p><strong>المبلغ:</strong> ${formatCurrency(item.installmentAmount)}</p>
-                  <p><strong>التاريخ:</strong> ${formatDate(item.dueDate)}</p>
-                  <p class="status-text">${type === 'overdue' ? 'متأخر' : 'قريب جداً'}</p>
-              </div>
-          </a>
-      `).join('');
+      
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      
+      container.innerHTML = items.map(item => {
+          const dueDate = new Date(item.dueDate);
+          const diffTime = dueDate - today;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          let statusText = '';
+          let statusDetails = '';
+          
+          if (type === 'overdue') {
+              const overdueDays = Math.abs(diffDays);
+              if (overdueDays === 1) {
+                  statusText = 'متأخر يوم';
+                  statusDetails = 'متأخر يوم واحد';
+              } else if (overdueDays === 2) {
+                  statusText = 'متأخر يومين';
+                  statusDetails = 'متأخر يومين';
+              } else if (overdueDays === 3) {
+                  statusText = 'متأخر 3 أيام';
+                  statusDetails = 'متأخر 3 أيام';
+              } else {
+                  statusText = `متأخر ${overdueDays} يوم`;
+                  statusDetails = `متأخر ${overdueDays} يوم`;
+              }
+          } else {
+              if (diffDays === 0) {
+                  statusText = 'يستحق اليوم';
+                  statusDetails = 'يستحق اليوم';
+              } else if (diffDays === 1) {
+                  statusText = 'يستحق غداً';
+                  statusDetails = 'يستحق خلال يوم';
+              } else if (diffDays === 2) {
+                  statusText = 'يستحق بعد يومين';
+                  statusDetails = 'يستحق خلال يومين';
+              } else if (diffDays === 3) {
+                  statusText = 'يستحق بعد 3 أيام';
+                  statusDetails = 'يستحق خلال 3 أيام';
+              } else if (diffDays <= 7) {
+                  statusText = `يستحق خلال ${diffDays} أيام`;
+                  statusDetails = `يستحق خلال ${diffDays} أيام`;
+              } else {
+                  statusText = `يستحق خلال ${diffDays} يوم`;
+                  statusDetails = `يستحق خلال ${diffDays} يوم`;
+              }
+          }
+          
+          return `
+              <a href="/crs/contract-details?projectId=${projectId}&customerName=${encodeURIComponent(item.customerName)}" class="installment-card ${type}">
+                  <div class="card-header">${item.customerName}</div>
+                  <div class="card-details">
+                      <p><strong>المبلغ:</strong> ${formatCurrency(item.installmentAmount)}</p>
+                      <p><strong>التاريخ:</strong> ${formatDate(item.dueDate)}</p>
+                      <p class="status-text">${statusDetails}</p>
+                  </div>
+              </a>
+          `;
+      }).join('');
   }
 </script>
